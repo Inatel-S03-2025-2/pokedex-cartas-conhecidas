@@ -1,52 +1,56 @@
-import Image from "next/image";
+"use client"
 
-interface Card {
-  id: number;
-  name: string;
-  image: string;
-  type: string;
-  color?: string;
+import { useState } from "react"
+import Image from "next/image"
+import { motion } from "framer-motion"
+import { Star, ArrowRight } from "lucide-react"
+
+interface PokemonCardProps {
+  id: number
+  name: string
+  image: string
+  isFavorite: boolean
 }
 
-const getTypeColor = (type: string) => {
-  const colors: { [key: string]: string } = {
-    Fire: "bg-gradient-to-br from-red-400 to-orange-500",
-    Water: "bg-gradient-to-br from-blue-400 to-cyan-500",
-    Grass: "bg-gradient-to-br from-green-400 to-green-600",
-    Electric: "bg-gradient-to-br from-yellow-400 to-yellow-600",
-    Psychic: "bg-gradient-to-br from-pink-400 to-purple-500",
-    Rock: "bg-gradient-to-br from-gray-400 to-gray-600",
-    Ground: "bg-gradient-to-br from-yellow-600 to-orange-600",
-    Flying: "bg-gradient-to-br from-indigo-400 to-blue-500",
-  };
-  return colors[type] || "bg-gradient-to-br from-gray-400 to-gray-600";
-};
+export default function PokemonCard({ id, name, image, isFavorite }: PokemonCardProps) {
+  const [favorite, setFavorite] = useState(isFavorite)
 
-export default function PokemonCard({ card }: { card: Card }) {
   return (
-    <div className="group bg-white rounded-3xl shadow-xl overflow-hidden hover:shadow-2xl transform hover:scale-105 transition-all duration-300 border border-gray-100">
-      <div className={`${card.color || getTypeColor(card.type)} p-8 text-center relative overflow-hidden`}>
-        <div className="absolute inset-0 bg-white/10"></div>
-        <Image 
-          src={card.image} 
-          alt={card.name} 
-          width={140} 
-          height={140} 
-          className="mx-auto relative z-10 drop-shadow-2xl group-hover:scale-110 transition-transform duration-300" 
-        />
-      </div>
-      <div className="p-6">
-        <div className="flex justify-between items-center mb-3">
-          <h2 className="text-2xl font-bold text-gray-800">{card.name}</h2>
-          <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
-            #{card.id.toString().padStart(3, '0')}
-          </span>
+    <motion.div
+      whileHover={{ y: -8, scale: 1.02 }}
+      transition={{ type: "spring", stiffness: 300 }}
+      className="bg-white rounded-2xl shadow-lg overflow-hidden"
+    >
+      {/* Card Header */}
+      <div className="flex items-center justify-between p-4 bg-[#F5F7FB]">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm">
+            <Image src="/login.png" alt={name} width={32} height={32} className="object-contain" />
+          </div>
+          <span className="font-semibold text-gray-900">{name}</span>
         </div>
-        <p className="text-gray-600 mb-6 text-lg">🏷️ {card.type}</p>
-        <button className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-3 rounded-2xl font-semibold hover:from-blue-600 hover:to-purple-700 transform hover:scale-105 transition-all duration-200 shadow-lg">
-          Ver Detalhes
-        </button>
+
+        
       </div>
-    </div>
-  );
+
+      {/* Card Image */}
+      <div className="relative bg-gradient-to-br from-[#2B4C9E] to-[#1E3A7A] p-8 flex items-center justify-center min-h-[250px]">
+        <motion.div whileHover={{ scale: 1.1, rotate: 5 }} transition={{ type: "spring", stiffness: 300 }}>
+          <Image src={image || "login.png"} alt={name} width={200} height={200} className="drop-shadow-2xl" />
+        </motion.div>
+      </div>
+
+      {/* Card Footer */}
+      <div className="p-4">
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          className="w-full flex items-center justify-center gap-2 py-3 text-[#2B4C9E] font-semibold hover:bg-[#F5F7FB] rounded-xl transition-colors"
+        >
+          Ver Detalhes
+          <ArrowRight size={18} />
+        </motion.button>
+      </div>
+    </motion.div>
+  )
 }

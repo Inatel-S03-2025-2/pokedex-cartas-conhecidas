@@ -1,60 +1,71 @@
-import Link from "next/link";
+"use client"
+
+import { useState } from "react"
+import Image from "next/image"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
+import { motion } from "framer-motion"
+import { LayoutGrid, LogOut } from "lucide-react"
 
 export default function Sidebar() {
+  const pathname = usePathname()
+  const [isHovered, setIsHovered] = useState(false)
+
   return (
-    <div className="w-80 bg-white/80 backdrop-blur-md shadow-2xl h-full border-r border-gray-200/50">
-      <div className="p-8">
-        {/* Logo */}
-        <div className="flex items-center space-x-3 mb-10">
-          <div className="w-12 h-12 bg-gradient-to-r from-red-500 to-yellow-500 rounded-full flex items-center justify-center shadow-lg">
-            <span className="text-white text-xl font-bold">⚡</span>
-          </div>
-          <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
-            Menu
-          </h2>
-        </div>
-        
-        {/* Navegação */}
-        <nav className="space-y-3">
-          <Link href="/" className="flex items-center space-x-4 p-4 text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 hover:text-blue-600 rounded-2xl transition-all duration-200 font-semibold">
-            <span className="text-2xl">🏠</span>
-            <span>Início</span>
-          </Link>
-          <Link href="/collection" className="flex items-center space-x-4 p-4 text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 hover:text-blue-600 rounded-2xl transition-all duration-200 font-semibold">
-            <span className="text-2xl">📚</span>
-            <span>Minha Coleção</span>
-          </Link>
-          <Link href="/search" className="flex items-center space-x-4 p-4 text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 hover:text-blue-600 rounded-2xl transition-all duration-200 font-semibold">
-            <span className="text-2xl">🔍</span>
-            <span>Buscar Pokémon</span>
-          </Link>
-          <Link href="/favorites" className="flex items-center space-x-4 p-4 text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 hover:text-blue-600 rounded-2xl transition-all duration-200 font-semibold">
-            <span className="text-2xl">❤️</span>
-            <span>Favoritos</span>
-          </Link>
-          <Link href="/stats" className="flex items-center space-x-4 p-4 text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 hover:text-blue-600 rounded-2xl transition-all duration-200 font-semibold">
-            <span className="text-2xl">📊</span>
-            <span>Estatísticas</span>
-          </Link>
-        </nav>
-        
-        {/* Seção de usuário */}
-        <div className="mt-12 p-6 bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl border border-blue-100">
-          <div className="flex items-center space-x-3 mb-4">
-            <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-              <span className="text-white text-lg font-bold">👤</span>
-            </div>
-            <div>
-              <h3 className="font-bold text-gray-800">Treinador</h3>
-              <p className="text-sm text-gray-600">Nível 25</p>
-            </div>
-          </div>
-          <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
-            <div className="bg-gradient-to-r from-blue-500 to-purple-600 h-2 rounded-full" style={{width: '75%'}}></div>
-          </div>
-          <p className="text-xs text-gray-600 text-center">750/1000 XP</p>
-        </div>
+    <motion.aside
+      initial={{ x: -100, opacity: 0 }}
+      animate={{ x: 0, opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className="w-64 bg-[#2B4C9E] text-white flex flex-col shadow-2xl"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      {/* Logo */}
+      <div className="p-6 border-b border-white/10">
+        <Image src="/log.png" alt="Pokédex Logo" width={150} height={45} className="brightness-0 invert" />
       </div>
-    </div>
-  );
+
+      {/* Navigation */}
+      <nav className="flex-1 p-4">
+        <Link href="/collection">
+          <motion.div
+            whileHover={{ scale: 1.05, x: 5 }}
+            whileTap={{ scale: 0.95 }}
+            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
+              pathname === "/collection" ? "bg-white/20 shadow-lg" : "hover:bg-white/10"
+            }`}
+          >
+            <LayoutGrid size={20} />
+            <span className="font-semibold">Coleção</span>
+          </motion.div>
+        </Link>
+      </nav>
+
+      {/* Footer */}
+      <div className="p-6 border-t border-white/10">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+            <span className="text-sm font-bold">TS</span>
+          </div>
+          <div>
+            <p className="text-sm font-semibold">Tech Startup</p>
+            <p className="text-xs text-white/70">startup@maker.com.br</p>
+          </div>
+        </div>
+
+        <Link href="/login">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="flex items-center gap-2 text-sm text-white/80 hover:text-white transition-colors"
+          >
+            <LogOut size={16} />
+            <span>Sair</span>
+          </motion.button>
+        </Link>
+
+        <p className="text-xs text-white/50 mt-4">©2025 Scooter Tech Studio</p>
+      </div>
+    </motion.aside>
+  )
 }
