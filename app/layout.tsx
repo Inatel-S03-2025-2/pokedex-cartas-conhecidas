@@ -1,24 +1,28 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "./globals.css";
+import type React from "react"
+import type { Metadata } from "next"
+import { Inter } from "next/font/google"
+import { Analytics } from "@vercel/analytics/next"
+import "./globals.css"
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Pokédex - Sua Coleção Digital",
-  description: "Gerencie sua coleção de Pokémon",
-};
+  title: "Pokédex - Gerencie sua coleção",
+  description: "Gerencie sua coleção de cartas Pokémon",
+  generator: "v0.app",
+}
 
 export default function RootLayout({
   children,
-}: {
-  children: React.ReactNode;
-}) {
+}: Readonly<{
+  children: React.ReactNode
+}>) {
   return (
     <html lang="pt-BR">
-      <body className={inter.className}>
+      <body className={`${inter.className} antialiased`}>
         {children}
+        <Analytics />
       </body>
     </html>
-  );
+  )
 }

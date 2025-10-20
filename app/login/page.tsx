@@ -1,127 +1,121 @@
-"use client";
+"use client"
 
-import Image from "next/image";
-import Link from "next/link";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import type React from "react"
+
+import { useState } from "react"
+import { useRouter } from "next/navigation"
+import Image from "next/image"
+import { motion } from "framer-motion"
+import { User, Lock } from "lucide-react"
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const router = useRouter();
+  const router = useRouter()
+  const [username, setUsername] = useState("")
+  const [password, setPassword] = useState("")
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Simular login e redirecionar para home
-    router.push("/home");
-  };
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault()
+    // Simple validation - in production, use proper authentication
+    if (username && password) {
+      router.push("/collection")
+    }
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl overflow-hidden max-w-5xl w-full flex min-h-[600px]">
-        {/* Lado esquerdo - Formulário */}
-        <div className="flex-1 p-8 lg:p-12 flex flex-col justify-center max-w-md mx-auto lg:mx-0">
-          {/* Logo e Título */}
-          <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-lg">
-              <span className="text-white text-2xl font-bold">⚡</span>
+    <div className="min-h-screen flex">
+      {/* Left side - Login Form */}
+      <motion.div
+        initial={{ opacity: 0, x: -50 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.6 }}
+        className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-gradient-to-br from-[#1a2847] to-[#2B4C9E]"
+      >
+        <div className="w-full max-w-md">
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 0.2, duration: 0.5 }}
+            className="bg-white rounded-3xl p-8 shadow-2xl"
+          >
+            {/* Logo */}
+            <div className="flex justify-center mb-8">
+              <Image src="/log.png" alt="Pokédex Logo" width={200} height={60} priority />
             </div>
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">
-              Pokédex
-            </h1>
-            <p className="text-gray-500 text-sm">Faça login para continuar sua jornada</p>
-          </div>
 
-          {/* Formulário */}
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div>
+            {/* Title */}
+            <h1 className="text-3xl font-bold text-center mb-2 text-gray-900">LOGIN</h1>
+            <p className="text-center text-gray-600 mb-8 text-sm">Gerencie sua coleção de cartas Pokémon</p>
+
+            {/* Form */}
+            <form onSubmit={handleLogin} className="space-y-4">
+              {/* Username Input */}
               <div className="relative">
-                <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400">
-                  👤
-                </span>
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                  <User size={20} />
+                </div>
                 <input
                   type="text"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-                  placeholder="Email ou usuário"
+                  placeholder="Username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  className="w-full pl-12 pr-4 py-3 bg-[#F5F7FB] rounded-xl border-none focus:outline-none focus:ring-2 focus:ring-[#2B4C9E] transition-all text-gray-900 placeholder:text-gray-400"
                   required
                 />
               </div>
-            </div>
 
-            <div>
+              {/* Password Input */}
               <div className="relative">
-                <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400">
-                  🔒
-                </span>
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                  <Lock size={20} />
+                </div>
                 <input
                   type="password"
+                  placeholder="Password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-                  placeholder="Senha"
+                  className="w-full pl-12 pr-4 py-3 bg-[#F5F7FB] rounded-xl border-none focus:outline-none focus:ring-2 focus:ring-[#2B4C9E] transition-all text-gray-900 placeholder:text-gray-400"
                   required
                 />
               </div>
-            </div>
 
-            <div className="flex items-center justify-between text-sm">
-              <label className="flex items-center">
-                <input type="checkbox" className="w-4 h-4 text-blue-500 bg-gray-100 border-gray-300 rounded focus:ring-blue-500" />
-                <span className="ml-2 text-gray-600">Lembrar de mim</span>
-              </label>
-              <a href="#" className="text-blue-500 hover:text-blue-700 font-medium">
-                Esqueceu a senha?
-              </a>
-            </div>
+              {/* Login Button */}
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                type="submit"
+                className="w-full py-3 bg-[#2B4C9E] text-white rounded-xl font-semibold hover:bg-[#1E3A7A] transition-colors shadow-lg"
+              >
+                Login
+              </motion.button>
+            </form>
+          </motion.div>
+        </div>
+      </motion.div>
 
-            <button
-              type="submit"
-              className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-3 rounded-xl font-semibold hover:from-blue-600 hover:to-indigo-700 transform hover:scale-[1.02] transition-all duration-200 shadow-lg"
-            >
-              Entrar
-            </button>
-          </form>
-
-          <div className="mt-6 text-center">
-            <p className="text-gray-600 text-sm">
-              Não tem uma conta?{" "}
-              <a href="#" className="text-blue-500 hover:text-blue-700 font-semibold">
-                Cadastre-se
-              </a>
-            </p>
-          </div>
+      {/* Right side - Lugia Image */}
+      <motion.div
+        initial={{ opacity: 0, x: 50 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.6 }}
+        className="hidden lg:flex w-1/2 relative bg-gradient-to-br from-[#1a2847] to-[#2B4C9E] items-center justify-center overflow-hidden"
+      >
+        {/* Decorative curves */}
+        <div className="absolute inset-0 opacity-20">
+          <svg className="w-full h-full" viewBox="0 0 800 800" fill="none">
+            <path d="M0 400C200 300 400 500 800 400" stroke="#4A6FBF" strokeWidth="60" />
+            <path d="M0 600C200 500 400 700 800 600" stroke="#4A6FBF" strokeWidth="60" />
+          </svg>
         </div>
 
-        {/* Lado direito - Ilustração */}
-        <div className="hidden lg:flex flex-1 bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 items-center justify-center p-12 relative overflow-hidden">
-          <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cg%20fill%3D%22%23ffffff%22%20fill-opacity%3D%220.05%22%3E%3Ccircle%20cx%3D%2230%22%20cy%3D%2230%22%20r%3D%222%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-20"></div>
-          
-          <div className="text-center text-white z-10 relative">
-            <div className="mb-8">
-              <Image
-                src="/lugia.png.png"
-                alt="Pokémon Lugia"
-                width={280}
-                height={280}
-                className="mx-auto drop-shadow-2xl animate-float"
-              />
-            </div>
-            <h3 className="text-2xl font-bold mb-3">
-              Bem-vindo de volta!
-            </h3>
-            <p className="text-lg opacity-90">
-              Continue sua jornada no mundo Pokémon
-            </p>
-          </div>
-          
-          {/* Elementos decorativos */}
-          <div className="absolute top-20 left-10 w-16 h-16 bg-white/10 rounded-full animate-pulse"></div>
-          <div className="absolute bottom-20 right-10 w-12 h-12 bg-white/15 rounded-full animate-bounce"></div>
-          <div className="absolute top-1/3 right-20 w-8 h-8 bg-white/20 rounded-full"></div>
-        </div>
-      </div>
+        <motion.div
+          initial={{ scale: 0.8, rotate: -10 }}
+          animate={{ scale: 1, rotate: 0 }}
+          transition={{ delay: 0.3, duration: 0.8, type: "spring" }}
+          className="relative z-10"
+        >
+          <Image src="/login.png" alt="Lugia Pokémon" width={500} height={500} priority className="drop-shadow-2xl" />
+        </motion.div>
+      </motion.div>
     </div>
-  );
+  )
 }
