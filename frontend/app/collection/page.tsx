@@ -1,30 +1,59 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import { motion } from "framer-motion"
 import Sidebar from "@/components/Sidebar"
 import Header from "@/components/header"
 import PokemonCard from "@/components/PokemonCard"
+import PokemonModal from "@/components/PokemonModal"
 import { ChevronDown } from "lucide-react"
-
-const pokemonData = [
-  { id: 1, name: "Blastoise", image: "/login.png", isFavorite: true },
-  { id: 2, name: "Blastoise", image: "/login.png", isFavorite: true },
-  { id: 3, name: "Blastoise", image: "/login.png", isFavorite: true },
-  { id: 4, name: "Blastoise", image: "/login.png", isFavorite: true },
-  { id: 5, name: "Blastoise", image: "/login.png", isFavorite: false },
-]
+import { usePokemon, Pokemon } from "@/contexts/PokemonContext"
 
 export default function CollectionPage() {
+  const { pokemons, selectedPokemon, setSelectedPokemon, toggleFavorite } = usePokemon()
   const [typeFilter, setTypeFilter] = useState("Todos os Tipos")
   const [rarityFilter, setRarityFilter] = useState("Todas as Raridade")
+  const [searchQuery, setSearchQuery] = useState("")
+
+  const filteredPokemons = useMemo(() => {
+    let filtered = pokemons
+    
+    if (searchQuery) {
+      filtered = filtered.filter(pokemon => 
+        pokemon.name.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    }
+    
+    if (typeFilter !== "Todos os Tipos") {
+      filtered = filtered.filter(pokemon => pokemon.type === typeFilter)
+    }
+    
+    if (rarityFilter !== "Todas as Raridade") {
+      filtered = filtered.filter(pokemon => pokemon.rarity === rarityFilter)
+    }
+    
+    return filtered
+  }, [pokemons, typeFilter, rarityFilter, searchQuery])
+
+  const handleCardClick = (pokemon: Pokemon) => {
+    setSelectedPokemon(pokemon)
+  }
+
+  const handleCloseModal = () => {
+    setSelectedPokemon(null)
+  }
 
   return (
     <div className="flex min-h-screen bg-[#E8EBF5]">
       <Sidebar />
 
       <div className="flex-1 flex flex-col">
-        <Header title="Minha Coleção" subtitle="12 cartas encontradas" />
+        <Header 
+          title="Minha Coleção" 
+          subtitle={`${filteredPokemons.length} cartas encontradas`}
+          searchValue={searchQuery}
+          onSearchChange={setSearchQuery}
+        />
 
         <main className="flex-1 p-8">
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
@@ -41,6 +70,7 @@ export default function CollectionPage() {
                   <option>Fogo</option>
                   <option>Planta</option>
                   <option>Elétrico</option>
+                  <option>Psíquico</option>
                 </select>
                 <ChevronDown
                   className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
@@ -69,20 +99,31 @@ export default function CollectionPage() {
 
             {/* Pokemon Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {pokemonData.map((pokemon, index) => (
+              {filteredPokemons.map((pokemon, index) => (
                 <motion.div
                   key={pokemon.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1, duration: 0.5 }}
                 >
-                  <PokemonCard {...pokemon} />
+                  <PokemonCard 
+                    pokemon={pokemon}
+                    onCardClick={handleCardClick}
+                    onToggleFavorite={toggleFavorite}
+                  />
                 </motion.div>
               ))}
             </div>
           </motion.div>
         </main>
       </div>
+
+      <PokemonModal
+        pokemon={selectedPokemon}
+        isOpen={!!selectedPokemon}
+        onClose={handleCloseModal}
+        onToggleFavorite={toggleFavorite}
+      />
     </div>
   )
 }

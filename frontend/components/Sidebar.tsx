@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+
 import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
@@ -9,7 +9,6 @@ import { LayoutGrid, LogOut } from "lucide-react"
 
 export default function Sidebar() {
   const pathname = usePathname()
-  const [isHovered, setIsHovered] = useState(false)
 
   return (
     <motion.aside
@@ -17,8 +16,6 @@ export default function Sidebar() {
       animate={{ x: 0, opacity: 1 }}
       transition={{ duration: 0.5 }}
       className="w-64 bg-[#2B4C9E] text-white flex flex-col shadow-2xl"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
     >
       {/* Logo */}
       <div className="p-6 border-b border-white/10">

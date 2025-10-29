@@ -5,8 +5,12 @@ import Image from "next/image"
 import Link from "next/link"
 import Sidebar from "@/components/Sidebar"
 import Header from "@/components/header"
+import { usePokemon } from "@/contexts/PokemonContext"
 
 export default function HomePage() {
+  const { getStats } = usePokemon()
+  const stats = getStats()
+
   return (
     <div className="flex min-h-screen bg-[#E8EBF5]">
       <Sidebar />
@@ -40,7 +44,7 @@ export default function HomePage() {
                   </Link>
                 </div>
                 <div className="flex-1">
-                  <Image src="/login.png" alt="Pokémon" width={400} height={400} className="drop-shadow-2xl" />
+                  <Image src="/pokemon.png" alt="Pokémon" width={400} height={400} className="drop-shadow-2xl" />
                 </div>
               </div>
             </div>
@@ -54,7 +58,7 @@ export default function HomePage() {
                 className="bg-white rounded-2xl p-6 shadow-lg"
               >
                 <h3 className="text-lg font-semibold text-gray-700 mb-2">Total de Cartas</h3>
-                <p className="text-4xl font-bold text-[#2B4C9E]">12</p>
+                <p className="text-4xl font-bold text-[#2B4C9E]">{stats.total}</p>
               </motion.div>
 
               <motion.div
@@ -64,7 +68,7 @@ export default function HomePage() {
                 className="bg-white rounded-2xl p-6 shadow-lg"
               >
                 <h3 className="text-lg font-semibold text-gray-700 mb-2">Tipos Diferentes</h3>
-                <p className="text-4xl font-bold text-[#2B4C9E]">5</p>
+                <p className="text-4xl font-bold text-[#2B4C9E]">{stats.types}</p>
               </motion.div>
 
               <motion.div
@@ -74,7 +78,7 @@ export default function HomePage() {
                 className="bg-white rounded-2xl p-6 shadow-lg"
               >
                 <h3 className="text-lg font-semibold text-gray-700 mb-2">Cartas Raras</h3>
-                <p className="text-4xl font-bold text-[#2B4C9E]">3</p>
+                <p className="text-4xl font-bold text-[#2B4C9E]">{stats.rare}</p>
               </motion.div>
             </div>
           </motion.div>
