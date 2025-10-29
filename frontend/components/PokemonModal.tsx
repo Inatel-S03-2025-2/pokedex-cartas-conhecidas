@@ -2,17 +2,16 @@
 
 import { motion, AnimatePresence } from "framer-motion"
 import Image from "next/image"
-import { X, Heart, Zap, Shield } from "lucide-react"
+import { X, Zap, Shield } from "lucide-react"
 import { Pokemon } from "@/contexts/PokemonContext"
 
 interface PokemonModalProps {
   pokemon: Pokemon | null
   isOpen: boolean
   onClose: () => void
-  onToggleFavorite: (id: number) => void
 }
 
-export default function PokemonModal({ pokemon, isOpen, onClose, onToggleFavorite }: PokemonModalProps) {
+export default function PokemonModal({ pokemon, isOpen, onClose }: PokemonModalProps) {
   if (!pokemon) return null
 
   const getTypeColor = (type: string) => {
@@ -62,20 +61,9 @@ export default function PokemonModal({ pokemon, isOpen, onClose, onToggleFavorit
                 <X size={20} />
               </button>
               
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <h2 className="text-2xl font-bold">{pokemon.name}</h2>
-                  <p className="text-white/80">#{pokemon.id.toString().padStart(3, '0')}</p>
-                </div>
-                <button
-                  onClick={() => onToggleFavorite(pokemon.id)}
-                  className="p-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
-                >
-                  <Heart 
-                    size={24} 
-                    className={pokemon.isFavorite ? "fill-red-500 text-red-500" : "text-white"} 
-                  />
-                </button>
+              <div className="mb-4">
+                <h2 className="text-2xl font-bold">{pokemon.name}</h2>
+                <p className="text-white/80">#{pokemon.id.toString().padStart(3, '0')}</p>
               </div>
 
               <div className="flex items-center justify-center">
@@ -113,7 +101,6 @@ export default function PokemonModal({ pokemon, isOpen, onClose, onToggleFavorit
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <Heart size={16} className="text-red-500" />
                       <span className="text-sm">HP</span>
                     </div>
                     <div className="flex items-center gap-2">

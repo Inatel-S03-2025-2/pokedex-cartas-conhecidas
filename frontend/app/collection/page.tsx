@@ -109,7 +109,7 @@ export default function CollectionPage() {
                   <PokemonCard 
                     pokemon={pokemon}
                     onCardClick={handleCardClick}
-                    onToggleFavorite={toggleFavorite}
+                    onToggleFavorite={() => {}}
                   />
                 </motion.div>
               ))}
@@ -122,7 +122,6 @@ export default function CollectionPage() {
         pokemon={selectedPokemon}
         isOpen={!!selectedPokemon}
         onClose={handleCloseModal}
-        onToggleFavorite={toggleFavorite}
       />
     </div>
   )
