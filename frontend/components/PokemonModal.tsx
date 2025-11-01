@@ -16,11 +16,11 @@ export default function PokemonModal({ pokemon, isOpen, onClose }: PokemonModalP
 
   const getTypeColor = (type: string) => {
     const colors = {
-      "Fogo": "from-red-500 to-orange-500",
-      "Água": "from-blue-500 to-cyan-500",
-      "Planta": "from-green-500 to-emerald-500",
-      "Elétrico": "from-yellow-500 to-amber-500",
-      "Psíquico": "from-purple-500 to-pink-500"
+      "Fogo": "from-white-500 to-white-500",
+      "Água": "from-white-500 to-white-500",
+      "Planta": "from-white-500 to-white-500",
+      "Elétrico": "from-white-500 to-white-500",
+      "Psíquico": "from-white-500 to-white-500"
     }
     return colors[type as keyof typeof colors] || "from-gray-500 to-gray-600"
   }
