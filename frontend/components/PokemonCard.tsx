@@ -41,7 +41,7 @@ export default function PokemonCard({ pokemon, onCardClick, onToggleFavorite }: 
       </div>
 
       {/* Card Image */}
-      <div className={`relative bg-gradient-to-br ${getTypeColor(pokemon.type)} p-6 flex items-center justify-center h-[240px]`}>
+      <div className="relative bg-white p-6 flex items-center justify-center h-[240px]">
         <motion.div whileHover={{ scale: 1.1, rotate: 5 }} transition={{ type: "spring", stiffness: 300 }}>
           <Image 
             src={pokemon.image} 

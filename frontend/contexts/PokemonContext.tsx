@@ -23,91 +23,82 @@ interface PokemonContextType {
   filterByType: (type: string) => Pokemon[]
   filterByRarity: (rarity: string) => Pokemon[]
   getStats: () => { total: number, types: number, rare: number }
+  loading: boolean
 }
 
 const PokemonContext = createContext<PokemonContextType | undefined>(undefined)
 
-const mockPokemons: Pokemon[] = [
-  {
-    id: 6,
-    name: "Charizard",
-    image: "/charizard1.png",
-    type: "Fogo",
-    rarity: "Rara",
-    hp: 180,
-    attack: 150,
-    defense: 120,
-    description: "Um Pokémon do tipo Fogo/Voador. Suas chamas podem derreter quase qualquer coisa.",
-    isFavorite: true
-  },
-  {
-    id: 9,
-    name: "Blastoise",
-    image: "/blastoise1.png",
-    type: "Água",
-    rarity: "Rara",
-    hp: 170,
-    attack: 130,
-    defense: 140,
-    description: "Um Pokémon do tipo Água. Pode esmagar rochas com seus canhões de água.",
-    isFavorite: false
-  },
-  {
-    id: 3,
-    name: "Venusaur",
-    image: "/venusaur1.png",
-    type: "Planta",
-    rarity: "Rara",
-    hp: 160,
-    attack: 120,
-    defense: 130,
-    description: "Um Pokémon do tipo Planta/Veneno. Sua flor libera um aroma relaxante.",
-    isFavorite: true
-  },
-  {
-    id: 25,
-    name: "Pikachu",
-    image: "/pikachu1.png",
-    type: "Elétrico",
-    rarity: "Comum",
-    hp: 90,
-    attack: 100,
-    defense: 80,
-    description: "Um Pokémon do tipo Elétrico. Armazena eletricidade em suas bochechas.",
-    isFavorite: false
-  },
-  {
-    id: 130,
-    name: "Gyarados",
-    image: "/gyarados1.png",
-    type: "Água",
-    rarity: "Ultra Rara",
-    hp: 200,
-    attack: 180,
-    defense: 110,
-    description: "Um Pokémon do tipo Água/Voador. Extremamente feroz e destrutivo.",
-    isFavorite: true
-  },
-  {
-    id: 65,
-    name: "Alakazam",
-    image: "/alakazam1.png",
-    type: "Psíquico",
-    rarity: "Incomum",
-    hp: 120,
-    attack: 90,
-    defense: 85,
-    description: "Um Pokémon do tipo Psíquico. Seu cérebro nunca para de crescer.",
-    isFavorite: false
-  }
-]
+const typeTranslations: { [key: string]: string } = {
+  fire: "Fogo",
+  water: "Água",
+  grass: "Planta",
+  electric: "Elétrico",
+  psychic: "Psíquico",
+  normal: "Normal",
+  fighting: "Lutador",
+  poison: "Veneno",
+  ground: "Terra",
+  flying: "Voador",
+  bug: "Inseto",
+  rock: "Pedra",
+  ghost: "Fantasma",
+  dragon: "Dragão",
+  dark: "Sombrio",
+  steel: "Aço",
+  fairy: "Fada",
+  ice: "Gelo"
+}
+
+const getRarity = (baseExperience: number): string => {
+  if (baseExperience >= 300) return "Ultra Rara"
+  if (baseExperience >= 200) return "Rara"
+  if (baseExperience >= 100) return "Incomum"
+  return "Comum"
+}
 
 export function PokemonProvider({ children }: { children: ReactNode }) {
   const [pokemons, setPokemons] = useState<Pokemon[]>([])
   const [selectedPokemon, setSelectedPokemon] = useState<Pokemon | null>(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    setPokemons(mockPokemons)
+    const fetchPokemons = async () => {
+      try {
+        const pokemonIds = [1, 4, 7, 25, 39, 65, 94, 130, 144, 150]
+        const pokemonPromises = pokemonIds.map(async (id) => {
+          const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`)
+          const data = await response.json()
+          
+          const speciesResponse = await fetch(data.species.url)
+          const speciesData = await speciesResponse.json()
+          const description = speciesData.flavor_text_entries
+            .find((entry: any) => entry.language.name === 'en')?.flavor_text
+            .replace(/\f/g, ' ') || 'Descrição não disponível'
+
+          return {
+            id: data.id,
+            name: data.name.charAt(0).toUpperCase() + data.name.slice(1),
+            image: data.sprites.other['official-artwork'].front_default,
+            type: typeTranslations[data.types[0].type.name] || data.types[0].type.name,
+            rarity: getRarity(data.base_experience),
+            hp: data.stats[0].base_stat,
+            attack: data.stats[1].base_stat,
+            defense: data.stats[2].base_stat,
+            description,
+            isFavorite: false
+          }
+        })
+        
+        const pokemonData = await Promise.all(pokemonPromises)
+        setPokemons(pokemonData)
+      } catch (error) {
+        console.error('Erro ao buscar Pokémons:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchPokemons()
   }, [])
 
   const toggleFavorite = (id: number) => {
@@ -143,7 +134,8 @@ export function PokemonProvider({ children }: { children: ReactNode }) {
       toggleFavorite,
       filterByType,
       filterByRarity,
-      getStats
+      getStats,
+      loading
     }}>
       {children}
     </PokemonContext.Provider>

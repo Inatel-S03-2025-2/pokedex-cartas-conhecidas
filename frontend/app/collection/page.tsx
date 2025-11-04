@@ -10,7 +10,7 @@ import { ChevronDown } from "lucide-react"
 import { usePokemon, Pokemon } from "@/contexts/PokemonContext"
 
 export default function CollectionPage() {
-  const { pokemons, selectedPokemon, setSelectedPokemon, toggleFavorite } = usePokemon()
+  const { pokemons, selectedPokemon, setSelectedPokemon, toggleFavorite, loading } = usePokemon()
   const [typeFilter, setTypeFilter] = useState("Todos os Tipos")
   const [rarityFilter, setRarityFilter] = useState("Todas as Raridade")
   const [searchQuery, setSearchQuery] = useState("")
@@ -71,6 +71,9 @@ export default function CollectionPage() {
                   <option>Planta</option>
                   <option>Elétrico</option>
                   <option>Psíquico</option>
+                  <option>Normal</option>
+                  <option>Fantasma</option>
+                  <option>Gelo</option>
                 </select>
                 <ChevronDown
                   className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
@@ -98,22 +101,28 @@ export default function CollectionPage() {
             </div>
 
             {/* Pokemon Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {filteredPokemons.map((pokemon, index) => (
-                <motion.div
-                  key={pokemon.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1, duration: 0.5 }}
-                >
-                  <PokemonCard 
-                    pokemon={pokemon}
-                    onCardClick={handleCardClick}
-                    onToggleFavorite={() => {}}
-                  />
-                </motion.div>
-              ))}
-            </div>
+            {loading ? (
+              <div className="flex justify-center items-center h-64">
+                <div className="text-xl text-gray-600">Carregando Pokémons...</div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {filteredPokemons.map((pokemon, index) => (
+                  <motion.div
+                    key={pokemon.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1, duration: 0.5 }}
+                  >
+                    <PokemonCard 
+                      pokemon={pokemon}
+                      onCardClick={handleCardClick}
+                      onToggleFavorite={() => {}}
+                    />
+                  </motion.div>
+                ))}
+              </div>
+            )}
           </motion.div>
         </main>
       </div>
