@@ -113,7 +113,7 @@ export default function LoginPage() {
           transition={{ delay: 0.3, duration: 0.8, type: "spring" }}
           className="relative z-10"
         >
-          <Image src="/login.png" alt="Lugia Pokémon" width={500} height={500} priority className="drop-shadow-2xl" />
+          <Image src="/login.png" alt="Lugia Pokémon" width={900} height={900} priority className="drop-shadow-2xl" />
         </motion.div>
       </motion.div>
     </div>
