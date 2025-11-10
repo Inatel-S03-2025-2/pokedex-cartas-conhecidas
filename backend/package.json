@@ -1,34 +1,33 @@
 {
-  "name": "pokedex-cartas-conhecidas",
+  "name": "pokedex-backend3-soa",
   "version": "1.0.0",
-  "description": "Sistema para gerenciar cartas de Pokémon conhecidas por cada jogador",
+  "description": "Backend SOA simples para sistema Pokédex seguindo diagrama de classes",
   "main": "dist/app.js",
   "scripts": {
     "build": "prisma generate && tsc",
     "start": "node dist/app.js",
     "dev": "ts-node-dev --respawn --transpile-only src/app.ts",
-    "test": "jest",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio"
   },
-  "author": "",
-  "license": "ISC",
   "dependencies": {
-    "@prisma/client": "^6.17.1",
-    "cors": "^2.8.5",
-    "dotenv": "^16.0.3",
+    "@prisma/client": "^5.6.0",
     "express": "^4.18.2",
-    "prisma": "^6.17.1"
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "axios": "^1.6.0",
+    "jsonwebtoken": "^9.0.2",
+    "bcryptjs": "^2.4.3"
   },
   "devDependencies": {
-    "@types/cors": "^2.8.13",
-    "@types/express": "^4.17.17",
-    "@types/jest": "^29.5.0",
-    "@types/node": "^18.15.11",
-    "jest": "^29.5.0",
-    "ts-jest": "^29.1.0",
+    "@types/express": "^4.17.21",
+    "@types/cors": "^2.8.17",
+    "@types/node": "^20.8.9",
+    "@types/jsonwebtoken": "^9.0.5",
+    "@types/bcryptjs": "^2.4.6",
+    "typescript": "^5.2.2",
     "ts-node-dev": "^2.0.0",
-    "typescript": "^5.0.4"
+    "prisma": "^5.6.0"
   }
 }

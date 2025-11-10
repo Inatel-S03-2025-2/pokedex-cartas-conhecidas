@@ -1,9 +1,5 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
-  output   = "../src/generated/prisma"
 }
 
 datasource db {
@@ -11,29 +7,34 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id           Int      @id @default(autoincrement())
+  sessionToken String?  @unique
+  role         String   @default("user")
+  login        String   @unique
+  password     String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relacionamento com cartas conhecidas
+  cards Card[]
+
+  @@map("users")
+}
+
 model Card {
-  id          String   @id @default(uuid())
+  cardId      Int     @id @default(autoincrement())
+  userId      Int
+  pokeId      Int
   name        String
-  type        String
-  rarity      String
-  imageUrl    String?
+  type        String?
   description String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  // Relacionamentos
-  currentPlayers Player[] @relation("CurrentCards")
-  knownPlayers   Player[] @relation("KnownCards")
-}
+  // Relacionamento com usuário
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-model Player {
-  id        String   @id @default(uuid())
-  name      String
-  email     String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Relacionamentos
-  knownCards   Card[] @relation("KnownCards")
-  currentCards Card[] @relation("CurrentCards")
+  @@unique([userId, pokeId]) // Um usuário pode conhecer cada pokémon apenas uma vez
+  @@map("cards")
 }

@@ -1,52 +1,64 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import prisma from './config/prisma/client';
+
+// Import controllers
+import { userController } from './controllers/UserController';
+import { cardController } from './controllers/CardController';
+import { HttpStatusCode } from 'axios';
 
 // Load environment variables
 dotenv.config();
 
-// Initialize Express app
 const app = express();
 
 // Middleware
 app.use(express.json());
 app.use(cors());
 
-// Defina aqui as rotas - a ser implementado
-// app.use('/api/players', playerRouter);
-// app.use('/api/cards', cardRouter);
-
-// Default route
-app.get('/', (req, res) => {
-  res.send('Pokémon Card Tracker API');
+// Health check
+app.get('/health', (req, res) => {
+  res.json({
+    status: 'ok',
+    message: 'Pokédex Backend3 SOA running',
+    timestamp: new Date().toISOString()
+  });
 });
 
-// Error handling middleware
+// Routes - Auth
+app.post('/auth/login', userController.login.bind(userController));
+app.post('/auth/logout', userController.logout.bind(userController));
+app.post('/auth/register', userController.register.bind(userController));
+
+// Routes - Cards
+app.post('/cards/known', cardController.markAsKnown.bind(cardController));
+app.get('/cards/user/:userId/pokemon-ids', cardController.listCardPokemonId.bind(cardController));
+app.get('/cards/user/:userId', cardController.listCards.bind(cardController));
+app.get('/cards/:cardId/description', cardController.getCardDescription.bind(cardController));
+
+// Error handling
 app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
   console.error(err.stack);
-  res.status(500).send({ error: err.message || 'Something went wrong!' });
+  res.status(500).json({
+    success: false,
+    message: 'Erro interno do servidor'
+  });
 });
 
-// Start the server
+// 404 handler
+app.use('*', (req, res) => {
+  res.status(HttpStatusCode.NotFound).json({
+    success: false,
+    message: 'Endpoint não encontrado'
+  });
+});
+
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, async () => {
-  try {
-    // Test database connection
-    await prisma.$connect();
-    console.log('🔌 Connected to database');
-    console.log(`🚀 Server running on port ${PORT}`);
-  } catch (error) {
-    console.error('❌ Failed to connect to database:', error);
-    process.exit(1);
-  }
-});
 
-// Handle graceful shutdown
-process.on('SIGINT', async () => {
-  await prisma.$disconnect();
-  console.log('💤 Database connection closed');
-  process.exit(0);
+app.listen(PORT, () => {
+  console.log(`🚀 Backend3 SOA running on port ${PORT}`);
+  console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log('🎯 Arquitetura: SOA simples (Service-Model-Controller)');
 });
 
 export default app;
