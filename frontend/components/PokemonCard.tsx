@@ -14,13 +14,13 @@ interface PokemonCardProps {
 export default function PokemonCard({ pokemon, onCardClick, onToggleFavorite }: PokemonCardProps) {
   const getTypeColor = (type: string) => {
     const colors = {
-      "Fogo": "from-red-500 to-orange-500",
-      "Água": "from-blue-500 to-cyan-500",
-      "Planta": "from-green-500 to-emerald-500",
-      "Elétrico": "from-yellow-500 to-amber-500",
-      "Psíquico": "from-purple-500 to-pink-500"
+      "Fogo": "from-white-500 to-white-500",
+      "Água": "from-white-500 to-white-500",
+      "Planta": "from-white-500 to-white-500",
+      "Elétrico": "from-white-500 to-white-500",
+      "Psíquico": "from-white-500 to-white-500"
     }
-    return colors[type as keyof typeof colors] || "from-gray-500 to-gray-600"
+    return colors[type as keyof typeof colors] || "from-black-500 to-black-600"
   }
 
   return (
@@ -34,14 +34,14 @@ export default function PokemonCard({ pokemon, onCardClick, onToggleFavorite }: 
       <div className="flex items-center justify-between p-4 bg-[#F5F7FB] h-[80px]">
         <div className="flex items-center gap-3">
           <div className={`w-10 h-10 bg-gradient-to-r ${getTypeColor(pokemon.type)} rounded-xl flex items-center justify-center shadow-sm`}>
-            <span className="text-white font-bold text-sm">#{pokemon.id}</span>
+            <span className="text-black' font-bold text-sm">#{pokemon.id}</span>
           </div>
           <span className="font-semibold text-gray-900 truncate">{pokemon.name}</span>
         </div>
       </div>
 
       {/* Card Image */}
-      <div className={`relative bg-gradient-to-br ${getTypeColor(pokemon.type)} p-6 flex items-center justify-center h-[240px]`}>
+      <div className="relative bg-white p-6 flex items-center justify-center h-[240px]">
         <motion.div whileHover={{ scale: 1.1, rotate: 5 }} transition={{ type: "spring", stiffness: 300 }}>
           <Image 
             src={pokemon.image} 
