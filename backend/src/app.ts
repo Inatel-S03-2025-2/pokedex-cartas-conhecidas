@@ -2,9 +2,8 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 
-// Import controllers
-import { userController } from './controllers/UserController';
-import { cardController } from './controllers/CardController';
+// Import routes
+import { apiRoutes } from './routes';
 import { HttpStatusCode } from 'axios';
 
 // Load environment variables
@@ -25,16 +24,8 @@ app.get('/health', (req, res) => {
   });
 });
 
-// Routes - Auth
-app.post('/auth/login', userController.login.bind(userController));
-app.post('/auth/logout', userController.logout.bind(userController));
-app.post('/auth/register', userController.register.bind(userController));
-
-// Routes - Cards
-app.post('/cards/known', cardController.markAsKnown.bind(cardController));
-app.get('/cards/user/:userId/pokemon-ids', cardController.listCardPokemonId.bind(cardController));
-app.get('/cards/user/:userId', cardController.listCards.bind(cardController));
-app.get('/cards/:cardId/description', cardController.getCardDescription.bind(cardController));
+// API Routes
+app.use('/api', apiRoutes);
 
 // Error handling
 app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
