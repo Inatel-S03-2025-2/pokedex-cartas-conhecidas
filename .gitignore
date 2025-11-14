@@ -81,3 +81,4 @@ $RECYCLE.BIN/
 # Optional: ignora imagens temporárias/de teste (remova se quiser versionar imagens)
 # /public/temp/
 # /public/test/
+backend/prisma/dev.db

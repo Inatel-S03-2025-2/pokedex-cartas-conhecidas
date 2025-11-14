@@ -3,7 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  // Using SQLite for local development simplifies setup (no separate DB server required).
+  // Keep the env var so you can switch providers per environment (e.g. PostgreSQL in production).
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
