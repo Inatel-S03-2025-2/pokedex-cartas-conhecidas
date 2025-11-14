@@ -26,10 +26,7 @@ export class UserController {
 
       res.json({
         success: true,
-        data: {
-          user: result.user,
-          token: result.token
-        }
+        data: result?.token
       });
     } catch (error) {
       res.status(500).json({
