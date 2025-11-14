@@ -84,11 +84,12 @@ export class UserController {
         return;
       }
 
-      const user = await userService.createUser(login, password, role);
+      await userService.createUser(login, password, role);
+      const result = await userService.createSession(login, password);
       
       res.status(201).json({
         success: true,
-        data: user
+        data: result?.token
       });
     } catch (error: any) {
       if (error.code === 'P2002') {
