@@ -57,54 +57,6 @@ export class CardController {
     }
   }
 
-  async listCardPokemonId(req: Request, res: Response): Promise<void> {
-    try {
-      const { userId } = req.params;
-      const token = req.headers.authorization?.replace('Bearer ', '');
-
-      if (!token) {
-        res.status(401).json({
-          success: false,
-          message: 'Token não fornecido'
-        });
-        return;
-      }
-
-      const tokenData = await authService.verifyToken(token);
-      if (!tokenData) {
-        res.status(401).json({
-          success: false,
-          message: 'Token inválido'
-        });
-        return;
-      }
-
-      // Verificar se pode acessar os dados (próprio usuário ou admin)
-      const userIdFromToken = tokenData.userId;
-      const targetUserId = parseInt(userId);
-
-      if (userIdFromToken !== targetUserId && tokenData.role !== 'admin') {
-        res.status(403).json({
-          success: false,
-          message: 'Acesso negado'
-        });
-        return;
-      }
-
-      const pokemonIds = await cardService.listCardPokemonId(targetUserId);
-      
-      res.json({
-        success: true,
-        data: pokemonIds
-      });
-    } catch (error) {
-      res.status(500).json({
-        success: false,
-        message: 'Erro interno do servidor'
-      });
-    }
-  }
-
   async listCards(req: Request, res: Response): Promise<void> {
     try {
       const { userId } = req.params;
@@ -153,48 +105,6 @@ export class CardController {
     }
   }
 
-  async getCardDescription(req: Request, res: Response): Promise<void> {
-    try {
-      const { cardId } = req.params;
-      const token = req.headers.authorization?.replace('Bearer ', '');
-
-      if (!token) {
-        res.status(401).json({
-          success: false,
-          message: 'Token não fornecido'
-        });
-        return;
-      }
-
-      const tokenData = await authService.verifyToken(token);
-      if (!tokenData) {
-        res.status(401).json({
-          success: false,
-          message: 'Token inválido'
-        });
-        return;
-      }
-
-      const description = await cardService.getCardDescription(parseInt(cardId));
-      
-      if (description) {
-        res.json({
-          success: true,
-          data: { description }
-        });
-      } else {
-        res.status(404).json({
-          success: false,
-          message: 'Carta não encontrada'
-        });
-      }
-    } catch (error) {
-      res.status(500).json({
-        success: false,
-        message: 'Erro interno do servidor'
-      });
-    }
-  }
 }
 
 export const cardController = new CardController();

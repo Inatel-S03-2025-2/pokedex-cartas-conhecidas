@@ -54,16 +54,6 @@ export class CardService {
     }
   }
 
-  async listCardPokemonId(userId: number): Promise<number[]> {
-    try {
-      const cards = await cardModel.findByUserId(userId);
-      return cards.map(card => card.pokeId);
-    } catch (error) {
-      console.error('Erro ao listar IDs dos pokémons:', error);
-      return [];
-    }
-  }
-
   async getCardDescription(cardId: number): Promise<string | null> {
     try {
       const card = await cardModel.findById(cardId);
