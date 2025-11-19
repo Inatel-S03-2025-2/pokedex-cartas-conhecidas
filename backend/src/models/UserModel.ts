@@ -3,40 +3,46 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 export interface UserModel {
-  id: number;
-  sessionToken: string | null;
+  userId: number;
+  username: string;
   role: string;
-  login: string;
-  password: string;
+  token: string | null;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export class UserModelService {
-  async findByLogin(login: string) {
+  async findByUsername(username: string) {
     return await prisma.user.findUnique({
-      where: { login }
+      where: { username }
     });
   }
 
-  async findBySessionToken(sessionToken: string) {
+  async findByToken(token: string) {
     return await prisma.user.findUnique({
-      where: { sessionToken }
+      where: { token }
     });
   }
 
-  async create(data: { login: string; password: string; role?: string }) {
+  async create(data: { username: string; role?: string }) {
     return await prisma.user.create({
       data: {
-        login: data.login,
-        password: data.password,
+        username: data.username,
         role: data.role || 'user'
       }
     });
   }
 
-  async updateSessionToken(id: number, sessionToken: string | null) {
+  async updateToken(userId: number, token: string | null) {
     return await prisma.user.update({
-      where: { id },
-      data: { sessionToken }
+      where: { userId },
+      data: { token }
+    });
+  }
+
+  async findById(userId: number) {
+    return await prisma.user.findUnique({
+      where: { userId }
     });
   }
 }

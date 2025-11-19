@@ -1,6 +1,6 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { cardService } from '../services/CardService';
-import { Card } from '@prisma/client';
+import { AuthRequest } from '../middlewares/authMiddleware';
 
 interface IListCardsByUserIdParams {
   userId: string;
@@ -8,13 +8,12 @@ interface IListCardsByUserIdParams {
 
 interface IListCardsResponse {
   success: boolean;
-  data?: Card[];
+  data?: any[];
   message?: string;
 }
 
 interface IMarkAsKnownBody {
-  pokeId: string;
-  userId: string;
+  cardId: number; // id externo da PokeAPI
 }
 
 interface IMarkAsKnownResponse {
@@ -23,20 +22,21 @@ interface IMarkAsKnownResponse {
 }
 
 export class CardController {
-  async markAsKnown(req: Request, res: Response): Promise<void> {
+  async markAsKnown(req: AuthRequest, res: Response): Promise<void> {
     try {
-      const { pokeId, userId }: IMarkAsKnownBody = req.body;
+      const { cardId }: IMarkAsKnownBody = req.body;
+      const userId = req.user!.userId;
 
-      if (!pokeId || !userId) {
+      if (!cardId) {
         const response: IMarkAsKnownResponse = {
           success: false,
-          message: 'pokeId e userId são obrigatórios.'
+          message: 'cardId é obrigatório.'
         };
         res.status(400).json(response);
         return;
       }
 
-      const success = await cardService.updateCard(parseInt(pokeId), parseInt(userId));
+      const success = await cardService.markAsKnown(cardId, userId);
       
       if (success) {
         const response: IMarkAsKnownResponse = {
@@ -60,11 +60,11 @@ export class CardController {
     }
   }
 
-  async listCardsByUserId(req: Request<IListCardsByUserIdParams>, res: Response): Promise<void> {
+  async listCardsByUserId(req: AuthRequest, res: Response): Promise<void> {
     try {
       const { userId } = req.params;
 
-      const cards = await cardService.listCards(parseInt(userId));
+      const cards = await cardService.listCardsByUserId(parseInt(userId));
       
       const response: IListCardsResponse = {
         success: true,
@@ -80,7 +80,7 @@ export class CardController {
     }
   }
 
-  async listAllCards(req: Request, res: Response): Promise<void> {
+  async listAllCards(req: AuthRequest, res: Response): Promise<void> {
     try {
       const cards = await cardService.listAllCards();
       const response: IListCardsResponse = {
@@ -95,7 +95,7 @@ export class CardController {
       };
       res.status(500).json(response);
     }
-
+  }
 }
 
 export const cardController = new CardController();

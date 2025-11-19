@@ -3,12 +3,11 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 export interface CardModel {
-  cardId: number;
+  id: number;
+  cardId: number; // id externo na PokeAPI
   userId: number;
-  pokeId: number;
-  name: string;
-  type: string | null;
-  description: string | null;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export class CardModelService {
@@ -19,56 +18,23 @@ export class CardModelService {
     });
   }
 
-  async findByUserIdAndPokeId(userId: number, pokeId: number) {
+  async findByUserIdAndCardId(userId: number, cardId: number) {
     return await prisma.card.findUnique({
       where: { 
-        userId_pokeId: { userId, pokeId }
-      }
-    });
-  }
-
-  async findByPokeIdForUser(userId: number, pokeId: number) {
-    return await prisma.card.findMany({
-      where: { 
-        userId,
-        pokeId 
+        userId_cardId: { userId, cardId }
       }
     });
   }
 
   async create(data: {
+    cardId: number; // id externo na PokeAPI
     userId: number;
-    pokeId: number;
-    name: string;
-    type?: string;
-    description?: string;
   }) {
     return await prisma.card.create({
       data: {
-        userId: data.userId,
-        pokeId: data.pokeId,
-        name: data.name,
-        type: data.type || null,
-        description: data.description || null
+        cardId: data.cardId,
+        userId: data.userId
       }
-    });
-  }
-
-  async update(cardId: number, data: {
-    name?: string;
-    type?: string;
-    description?: string;
-  }) {
-    return await prisma.card.update({
-      where: { cardId },
-      data
-    });
-  }
-
-  async findById(cardId: number) {
-    return await prisma.card.findUnique({
-      where: { cardId },
-      include: { user: true }
     });
   }
 

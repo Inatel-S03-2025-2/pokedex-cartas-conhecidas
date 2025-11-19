@@ -1,55 +1,40 @@
 import { cardModel } from '../models/CardModel';
-import { pokeAPI } from '../external/PokeAPI';
 
 export class CardService {
-  async updateCard(pokeId: number, userId: number): Promise<boolean> {
+  async markAsKnown(cardId: number, userId: number): Promise<boolean> {
     try {
-      // Buscar dados da PokeAPI
-      const pokeData = await pokeAPI.getCardData(pokeId);
-      if (!pokeData) {
-        return false;
-      }
-
       // Verificar se a carta já existe para este usuário
-      const existingCard = await cardModel.findByUserIdAndPokeId(userId, pokeId);
+      const existingCard = await cardModel.findByUserIdAndCardId(userId, cardId);
       
       if (existingCard) {
-        // Atualizar carta existente
-        await cardModel.update(existingCard.cardId, {
-          name: pokeData.name,
-          type: pokeData.types?.[0]?.type?.name || null,
-          description: pokeData.description || null
-        });
+        // Carta já foi marcada como conhecida
+        return true;
       } else {
-        // Criar nova carta
+        // Criar nova carta marcada como conhecida
         await cardModel.create({
-          userId,
-          pokeId,
-          name: pokeData.name,
-          type: pokeData.types?.[0]?.type?.name || null,
-          description: pokeData.description || null
+          cardId, // id externo da PokeAPI
+          userId
         });
       }
 
       return true;
     } catch (error) {
-      console.error('Erro ao atualizar carta:', error);
+      console.error('Erro ao marcar carta como conhecida:', error);
       return false;
     }
   }
 
-  async listCards(userId: number): Promise<any[]> {
+  async listCardsByUserId(userId: number): Promise<any[]> {
     try {
       const cards = await cardModel.findByUserId(userId);
       return cards.map(card => ({
-        cardId: card.cardId,
-        pokeId: card.pokeId,
-        name: card.name,
-        type: card.type,
-        description: card.description
+        cardId: card.cardId, // id externo da PokeAPI
+        userId: card.userId,
+        createdAt: card.createdAt,
+        updatedAt: card.updatedAt
       }));
     } catch (error) {
-      console.error('Erro ao listar cartas:', error);
+      console.error('Erro ao listar cartas por usuário:', error);
       return [];
     }
   }
@@ -58,37 +43,15 @@ export class CardService {
     try {
       const cards = await cardModel.findAll();
       return cards.map(card => ({
-        cardId: card.cardId,
-        pokeId: card.pokeId,
+        cardId: card.cardId, // id externo da PokeAPI
+        userId: card.userId,
+        username: card.user.username,
+        createdAt: card.createdAt,
+        updatedAt: card.updatedAt
       }));
     } catch (error) {
       console.error('Erro ao listar todas as cartas:', error);
       return [];
-    }
-  } 
-
-  async getCardDescription(cardId: number): Promise<string | null> {
-    try {
-      const card = await cardModel.findById(cardId);
-      if (!card) {
-        return null;
-      }
-
-      // Se não tem descrição salva, buscar na PokeAPI
-      if (!card.description) {
-        const pokeData = await pokeAPI.getCardData(card.pokeId);
-        if (pokeData && pokeData.description) {
-          await cardModel.update(cardId, {
-            description: pokeData.description
-          });
-          return pokeData.description;
-        }
-      }
-
-      return card.description;
-    } catch (error) {
-      console.error('Erro ao buscar descrição da carta:', error);
-      return null;
     }
   }
 }

@@ -1,19 +1,22 @@
 import { Router } from 'express';
 import { cardController } from '../controllers/CardController';
+import { authMiddleware } from '../middlewares/authMiddleware';
+import { internalMiddleware, internalAdminMiddleware, userMiddleware } from '../middlewares/roleMiddleware';
 
 const router = Router();
 
-// Card routes
+// Aplicar authMiddleware em todas as rotas de cards
+router.use(authMiddleware);
 
-/**
- * @deprecated This endpoint is deprecated. Use /marked instead.
- */
-router.post('/known', cardController.markAsKnown.bind(cardController));
-router.post('/marked', cardController.markAsKnown.bind(cardController));
+// Card routes com controle de acesso por role
 
-router.get('/', cardController.listAllCards.bind(cardController));
-router.get('/:userId', cardController.listCardsByUserId.bind(cardController));
-// router.get('/user/:userId/pokemon-ids', cardController.listCardPokemonId.bind(cardController));
-// router.get('/:cardId/description', cardController.getCardDescription.bind(cardController));
+// POST /marked - apenas para role "intern"
+router.post('/marked', internalMiddleware, cardController.markAsKnown.bind(cardController));
+
+// GET / - apenas para role "internAdmin" 
+router.get('/', internalAdminMiddleware, cardController.listAllCards.bind(cardController));
+
+// GET /:userId - apenas para role "user"
+router.get('/:userId', userMiddleware, cardController.listCardsByUserId.bind(cardController));
 
 export { router as cardRoutes };

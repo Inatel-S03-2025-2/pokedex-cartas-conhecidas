@@ -9,13 +9,13 @@ export class AuthService {
       const decoded = jwt.verify(token, this.jwtSecret) as any;
       
       // Verificar se o usuário ainda existe e se o token é válido
-      const user = await userModel.findBySessionToken(token);
+      const user = await userModel.findByToken(token);
       if (!user) {
         return null;
       }
 
       return {
-        userId: user.id,
+        userId: user.userId,
         role: user.role
       };
     } catch (error) {
@@ -29,8 +29,8 @@ export class AuthService {
       return false;
     }
 
-    // Admin pode acessar qualquer role
-    if (tokenData.role === 'admin') {
+    // internAdmin pode acessar qualquer role
+    if (tokenData.role === 'internAdmin') {
       return true;
     }
 
