@@ -71,6 +71,12 @@ export class CardModelService {
       include: { user: true }
     });
   }
+
+  async findAll() {
+    return await prisma.card.findMany({
+      include: { user: true }
+    });
+  }
 }
 
 export const cardModel = new CardModelService();

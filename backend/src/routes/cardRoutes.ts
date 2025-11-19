@@ -11,7 +11,8 @@ const router = Router();
 router.post('/known', cardController.markAsKnown.bind(cardController));
 router.post('/marked', cardController.markAsKnown.bind(cardController));
 
-router.get('/by-user/:userId', cardController.listCards.bind(cardController));
+router.get('/', cardController.listAllCards.bind(cardController));
+router.get('/:userId', cardController.listCardsByUserId.bind(cardController));
 // router.get('/user/:userId/pokemon-ids', cardController.listCardPokemonId.bind(cardController));
 // router.get('/:cardId/description', cardController.getCardDescription.bind(cardController));
 

@@ -1,109 +1,100 @@
 import { Request, Response } from 'express';
 import { cardService } from '../services/CardService';
-import { authService } from '../services/AuthService';
+import { Card } from '@prisma/client';
+
+interface IListCardsByUserIdParams {
+  userId: string;
+}
+
+interface IListCardsResponse {
+  success: boolean;
+  data?: Card[];
+  message?: string;
+}
+
+interface IMarkAsKnownBody {
+  pokeId: string;
+  userId: string;
+}
+
+interface IMarkAsKnownResponse {
+  success: boolean;
+  message: string;
+}
 
 export class CardController {
   async markAsKnown(req: Request, res: Response): Promise<void> {
     try {
-      const { pokeId, userId } = req.body;
-      const token = req.headers.authorization?.replace('Bearer ', '');
+      const { pokeId, userId }: IMarkAsKnownBody = req.body;
 
-      if (!token) {
-        res.status(401).json({
+      if (!pokeId || !userId) {
+        const response: IMarkAsKnownResponse = {
           success: false,
-          message: 'Token não fornecido'
-        });
+          message: 'pokeId e userId são obrigatórios.'
+        };
+        res.status(400).json(response);
         return;
       }
 
-      const tokenData = await authService.verifyToken(token);
-      if (!tokenData) {
-        res.status(401).json({
-          success: false,
-          message: 'Token inválido'
-        });
-        return;
-      }
-
-      // Usar o userId do token (segurança)
-      const userIdFromToken = tokenData.userId;
-
-      if (!pokeId) {
-        res.status(400).json({
-          success: false,
-          message: 'pokeId é obrigatório'
-        });
-        return;
-      }
-
-      const success = await cardService.updateCard(parseInt(pokeId), userIdFromToken);
+      const success = await cardService.updateCard(parseInt(pokeId), parseInt(userId));
       
       if (success) {
-        res.json({
+        const response: IMarkAsKnownResponse = {
           success: true,
-          message: 'Carta marcada como conhecida'
-        });
+          message: 'Carta marcada como conhecida.'
+        };
+        res.json(response);
       } else {
-        res.status(400).json({
+        const response: IMarkAsKnownResponse = {
           success: false,
-          message: 'Erro ao marcar carta como conhecida'
-        });
+          message: 'Erro ao marcar carta como conhecida.'
+        };
+        res.status(400).json(response);
       }
     } catch (error) {
-      res.status(500).json({
+      const response: IMarkAsKnownResponse = {
         success: false,
-        message: 'Erro interno do servidor'
-      });
+        message: 'Erro interno do servidor.'
+      };
+      res.status(500).json(response);
     }
   }
 
-  async listCards(req: Request, res: Response): Promise<void> {
+  async listCardsByUserId(req: Request<IListCardsByUserIdParams>, res: Response): Promise<void> {
     try {
       const { userId } = req.params;
-      const token = req.headers.authorization?.replace('Bearer ', '');
 
-      if (!token) {
-        res.status(401).json({
-          success: false,
-          message: 'Token não fornecido'
-        });
-        return;
-      }
-
-      const tokenData = await authService.verifyToken(token);
-      if (!tokenData) {
-        res.status(401).json({
-          success: false,
-          message: 'Token inválido'
-        });
-        return;
-      }
-
-      // Verificar se pode acessar os dados
-      const userIdFromToken = tokenData.userId;
-      const targetUserId = parseInt(userId);
-
-      if (userIdFromToken !== targetUserId && tokenData.role !== 'admin') {
-        res.status(403).json({
-          success: false,
-          message: 'Acesso negado'
-        });
-        return;
-      }
-
-      const cards = await cardService.listCards(targetUserId);
+      const cards = await cardService.listCards(parseInt(userId));
       
-      res.json({
+      const response: IListCardsResponse = {
         success: true,
         data: cards
-      });
+      };
+      res.json(response);
     } catch (error) {
-      res.status(500).json({
+      const response: IListCardsResponse = {
         success: false,
         message: 'Erro interno do servidor'
-      });
+      };
+      res.status(500).json(response);
     }
   }
+
+  async listAllCards(req: Request, res: Response): Promise<void> {
+    try {
+      const cards = await cardService.listAllCards();
+      const response: IListCardsResponse = {
+        success: true,
+        data: cards
+      };
+      res.json(response);
+    } catch (error) {
+      const response: IListCardsResponse = {
+        success: false,
+        message: 'Erro interno do servidor'
+      };
+      res.status(500).json(response);
+    }
 
 }
 

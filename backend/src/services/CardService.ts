@@ -54,6 +54,19 @@ export class CardService {
     }
   }
 
+  async listAllCards(): Promise<any[]> {
+    try {
+      const cards = await cardModel.findAll();
+      return cards.map(card => ({
+        cardId: card.cardId,
+        pokeId: card.pokeId,
+      }));
+    } catch (error) {
+      console.error('Erro ao listar todas as cartas:', error);
+      return [];
+    }
+  } 
+
   async getCardDescription(cardId: number): Promise<string | null> {
     try {
       const card = await cardModel.findById(cardId);

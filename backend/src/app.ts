@@ -19,7 +19,7 @@ app.use(cors());
 app.get('/health', (req, res) => {
   res.json({
     status: 'ok',
-    message: 'Pokédex Backend3 SOA running',
+    message: 'Pokédex running',
     timestamp: new Date().toISOString()
   });
 });
@@ -47,9 +47,8 @@ app.use('*', (req, res) => {
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-  console.log(`🚀 Backend3 SOA running on port ${PORT}`);
-  console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log('🎯 Arquitetura: SOA simples (Service-Model-Controller)');
+  console.log(`Running on port ${PORT}`);
+  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
 });
 
 export default app;

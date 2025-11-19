@@ -28,9 +28,6 @@ model Card {
   cardId      Int     @id @default(autoincrement())
   userId      Int
   pokeId      Int
-  name        String
-  type        String?
-  description String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
