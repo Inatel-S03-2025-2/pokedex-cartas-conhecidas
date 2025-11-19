@@ -8,9 +8,17 @@ export class AuthService {
     try {
       const decoded = jwt.verify(token, this.jwtSecret) as any;
       
+      if (!decoded || !decoded.userId || !decoded.role) {
+        return null;
+      }
+
       // Verificar se o usuário ainda existe e se o token é válido
-      const user = await userModel.findByToken(token);
+      const user = await userModel.findById(decoded.userId);
       if (!user) {
+        return null;
+      }
+
+      if (user.token !== token) {
         return null;
       }
 
