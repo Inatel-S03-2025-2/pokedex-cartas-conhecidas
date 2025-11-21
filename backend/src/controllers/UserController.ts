@@ -1,8 +1,9 @@
 import { Request, response, Response } from 'express';
 import { userService } from '../services/UserService';
+import { authAPI } from '../external/AuthAPI';
 
 interface ILoginBody {
-  username: string;
+  email: string;
   password: string;
 }
 
@@ -21,43 +22,32 @@ interface ISessionResponse {
 export class UserController {
   async login(req: Request, res: Response): Promise<void> {
     try {
-      const { username, password } = req.body as ILoginBody;
+      const { email, password } = req.body as ILoginBody;
 
-      if (!username || !password) {
+      if (!email || !password) {
         const response: ISessionResponse = {
           success: false,
-          message: 'Username e password são obrigatórios'
+          message: 'Os campos "email" e "password" são obrigatórios.'
         };
         res.status(400).json(response);
         return;
       }
 
-      const result = await userService.createSession(username);
-      
-      if (!result) {
+      const token = authAPI.login({ email, password });
+      if (!token) {
         const response: ISessionResponse = {
           success: false,
-          message: 'Erro ao criar sessão.'
+          message: 'Credenciais inválidas.'
         };
-        res.status(500).json(response);
+        res.status(401).json(response);
         return;
       }
 
-      const response: ISessionResponse = {
-        success: true,
-        message: 'Login realizado com sucesso.',
-        data: {
-          token: result.token,
-        }
-      };
-      res.json(response);
-    } catch (error) {
-      const response: ISessionResponse = {
-        success: false,
-        message: 'Erro interno do servidor'
-      };
-      res.status(500).json(response);
-    }
+      userService.createUser({email, token});
+
+      // TODO: Buscar outros dados do usuário (username)
+      
+    
   }
 
   async logout(req: Request, res: Response): Promise<void> {

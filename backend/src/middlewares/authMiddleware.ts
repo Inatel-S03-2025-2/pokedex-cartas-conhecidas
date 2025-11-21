@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { authService } from '../services/AuthService';
+import { tokenManager } from '../services/JTWService';
 import { userModel } from '../models/UserModel';
 
 export interface AuthRequest extends Request {
@@ -27,7 +27,7 @@ export async function authMiddleware(
     }
 
     // Verificar se o token é válido
-    const tokenData = await authService.verifyToken(token);
+    const tokenData = await tokenManager.verifyToken(token);
     if (!tokenData) {
       res.status(401).json({
         success: false,
