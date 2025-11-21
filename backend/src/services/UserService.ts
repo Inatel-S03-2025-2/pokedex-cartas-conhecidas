@@ -33,9 +33,9 @@ export class UserService {
       if (!user) {
         // Criar novo usuário com dados da AuthAPI
         user = await userModel.create({
-          username: authResponse.user.email.split('@')[0], // Usar parte do email como username
-          email: authResponse.user.email,
-          role: authResponse.user.role,
+          username: authResponse.email.split('@')[0], // Usar parte do email como username
+          email: authResponse.email,
+          role: 'user', // Usuários externos sempre são 'user'
           internalToken: authResponse.token
         });
       } else {

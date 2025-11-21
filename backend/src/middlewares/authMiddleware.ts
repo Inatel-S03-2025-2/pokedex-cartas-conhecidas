@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
 import { tokenManager } from '../services/JTWService';
-import { userModel } from '../models/UserModel';
 
 export interface AuthRequest extends Request {
   user?: {
@@ -36,21 +35,11 @@ export async function authMiddleware(
       return;
     }
 
-    // Buscar usuário no banco para verificar se o token ainda é válido
-    const user = await userModel.findByToken(token);
-    if (!user) {
-      res.status(401).json({
-        success: false,
-        message: 'Sessão inválida'
-      });
-      return;
-    }
-
-    // Adicionar dados do usuário à requisição
+    // Adicionar dados do usuário à requisição (diretamente do token)
     req.user = {
-      userId: user.userId,
-      username: user.username,
-      role: user.role
+      userId: tokenData.userId,
+      username: `user-${tokenData.userId}`, // Placeholder para username
+      role: tokenData.role
     };
 
     next();
