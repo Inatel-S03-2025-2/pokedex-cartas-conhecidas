@@ -10,10 +10,10 @@ router.use(authMiddleware);
 
 // Card routes com controle de acesso por role
 
-// POST /marked - apenas para role "intern"
+// POST /marked - apenas para role "internal"
 router.post('/marked', internalMiddleware, cardController.markAsKnown.bind(cardController));
 
-// GET / - apenas para role "internAdmin" 
+// GET / - apenas para role "internalAdmin" 
 router.get('/', internalAdminMiddleware, cardController.listAllCards.bind(cardController));
 
 // GET /:userId - apenas para role "user"

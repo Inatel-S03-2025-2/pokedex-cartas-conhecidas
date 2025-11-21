@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { userModel } from '../models/UserModel';
+import { userRepository } from '../repositories';
 
 export class JWTService {
   private jwtSecret = process.env.JWT_SECRET!;
@@ -23,7 +23,7 @@ export class JWTService {
       }
 
       // Verificar se o usuário ainda existe e se o token é válido
-      const user = await userModel.findById(payload.userId);
+      const user = await userRepository.findById(payload.userId);
       if (!user) {
         console.log(`Usuário não encontrado para userId: ${payload.userId}`);
         return null;

@@ -1,11 +1,10 @@
-import { cardModel } from '../models/CardModel';
-import { userModel } from '../models/UserModel';
+import { cardRepository, userRepository } from '../repositories';
 
 export class CardService {
   async markAsKnown(cardId: number, userId: number): Promise<boolean> {
     try {
       // Verificar se a carta já existe para este usuário
-      const existingCard = await cardModel.findByUserIdAndCardId(userId, cardId);
+      const existingCard = await cardRepository.findByUserIdAndCardId(userId, cardId);
       
       if (existingCard) {
         // Carta já foi marcada como conhecida
@@ -14,7 +13,7 @@ export class CardService {
         // Criar nova carta marcada como conhecida
         // Não precisa verificar se o usuário existe localmente,
         // pois ele pode existir no serviço externo (AuthAPI)
-        await cardModel.create({
+        await cardRepository.create({
           cardId, // id externo da PokeAPI
           userId  // userId pode referenciar usuário que ainda não logou localmente
         });
@@ -29,7 +28,7 @@ export class CardService {
 
   async listCardsByUserId(userId: number): Promise<any[]> {
     try {
-      const cards = await cardModel.findByUserId(userId);
+      const cards = await cardRepository.findByUserId(userId);
       return cards.map(card => ({
         cardId: card.cardId, // id externo da PokeAPI
         userId: card.userId,
@@ -44,11 +43,11 @@ export class CardService {
 
   async listAllCards(): Promise<any[]> {
     try {
-      const cards = await cardModel.findAll();
+      const cards = await cardRepository.findAll();
       return cards.map(card => ({
         cardId: card.cardId, // id externo da PokeAPI
         userId: card.userId,
-        username: card.user.username,
+        username: card.user?.username || 'Unknown',
         createdAt: card.createdAt,
         updatedAt: card.updatedAt
       }));

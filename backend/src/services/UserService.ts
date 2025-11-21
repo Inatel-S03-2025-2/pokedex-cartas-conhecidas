@@ -1,4 +1,4 @@
-import { UserModel, userModel } from '../models/UserModel';
+import { userRepository } from '../repositories';
 import { tokenManager } from './JTWService';
 import { authAPI } from '../external/AuthAPI';
 
@@ -28,11 +28,11 @@ export class UserService {
       }
 
       // 2. Buscar ou criar usuário no nosso banco
-      let user = await userModel.findByEmail(email);
+      let user = await userRepository.findByEmail(email);
       
       if (!user) {
         // Criar novo usuário com dados da AuthAPI
-        user = await userModel.create({
+        user = await userRepository.create({
           username: authResponse.email.split('@')[0], // Usar parte do email como username
           email: authResponse.email,
           role: 'user', // Usuários externos sempre são 'user'
@@ -40,7 +40,7 @@ export class UserService {
         });
       } else {
         // Atualizar internalToken do usuário existente
-        await userModel.updateInternalToken(user.userId, authResponse.token);
+        await userRepository.updateInternalToken(user.userId, authResponse.token);
         user.internalToken = authResponse.token;
       }
 
@@ -48,7 +48,7 @@ export class UserService {
       const internalJWT = tokenManager.generateToken(user.userId, user.role);
 
       // 4. Salvar JWT interno no banco
-      await userModel.updateToken(user.userId, internalJWT);
+      await userRepository.updateToken(user.userId, internalJWT);
 
       return {
         user: {
@@ -73,7 +73,7 @@ export class UserService {
       }
 
       // Invalidar apenas o JWT interno, manter internalToken
-      await userModel.updateToken(tokenData.userId, null);
+      await userRepository.updateToken(tokenData.userId, null);
       return true;
     } catch (error) {
       console.error('Erro no logout:', error);
