@@ -16,6 +16,8 @@ export function roleMiddleware(allowedRoles: string[]) {
       return;
     }
 
+    console.log(`Verificando role do usuário: ${req.user.role} contra permitidas: ${allowedRoles.join(', ')}`);
+
     if (!allowedRoles.includes(req.user.role)) {
       res.status(403).json({
         success: false,

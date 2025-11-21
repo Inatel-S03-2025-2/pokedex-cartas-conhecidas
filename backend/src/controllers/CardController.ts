@@ -13,6 +13,7 @@ interface IListCardsResponse {
 }
 
 interface IMarkAsKnownBody {
+  userId: number;
   cardId: number; // id externo da PokeAPI
 }
 
@@ -24,13 +25,12 @@ interface IMarkAsKnownResponse {
 export class CardController {
   async markAsKnown(req: AuthRequest, res: Response): Promise<void> {
     try {
-      const { cardId }: IMarkAsKnownBody = req.body;
-      const userId = req.user!.userId;
+      const { userId, cardId }: IMarkAsKnownBody = req.body;
 
-      if (!cardId) {
+      if (!userId || !cardId) {
         const response: IMarkAsKnownResponse = {
           success: false,
-          message: 'cardId é obrigatório.'
+          message: 'userId e cardId são obrigatórios.'
         };
         res.status(400).json(response);
         return;

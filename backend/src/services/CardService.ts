@@ -1,4 +1,5 @@
 import { cardModel } from '../models/CardModel';
+import { userModel } from '../models/UserModel';
 
 export class CardService {
   async markAsKnown(cardId: number, userId: number): Promise<boolean> {
@@ -11,9 +12,11 @@ export class CardService {
         return true;
       } else {
         // Criar nova carta marcada como conhecida
+        // Não precisa verificar se o usuário existe localmente,
+        // pois ele pode existir no serviço externo (AuthAPI)
         await cardModel.create({
           cardId, // id externo da PokeAPI
-          userId
+          userId  // userId pode referenciar usuário que ainda não logou localmente
         });
       }
 
