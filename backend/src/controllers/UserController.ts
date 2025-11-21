@@ -1,20 +1,21 @@
-import { Request, response, Response } from 'express';
+import { Request, Response } from 'express';
 import { userService } from '../services/UserService';
-import { authAPI } from '../external/AuthAPI';
 
 interface ILoginBody {
   email: string;
   password: string;
 }
 
-interface ILogoutHeader {
-  authorization: string;
-}
-
 interface ISessionResponse {
   success: boolean;
   message: string;
   data?: {
+    user: {
+      userId: number;
+      username: string;
+      email: string;
+      role: string;
+    };
     token: string;
   };
 }
@@ -33,26 +34,39 @@ export class UserController {
         return;
       }
 
-      const token = authAPI.login({ email, password });
-      if (!token) {
+      const result = await userService.createSession({ email, password });
+      
+      if (!result) {
         const response: ISessionResponse = {
           success: false,
-          message: 'Credenciais inválidas.'
+          message: 'Credenciais inválidas ou erro no serviço de autenticação.'
         };
         res.status(401).json(response);
         return;
       }
 
-      userService.createUser({email, token});
-
-      // TODO: Buscar outros dados do usuário (username)
-      
-    
+      const response: ISessionResponse = {
+        success: true,
+        message: 'Login realizado com sucesso',
+        data: {
+          user: result.user,
+          token: result.token
+        }
+      };
+      res.json(response);
+    } catch (error) {
+      console.error('Erro no login:', error);
+      const response: ISessionResponse = {
+        success: false,
+        message: 'Erro interno do servidor'
+      };
+      res.status(500).json(response);
+    }
   }
 
   async logout(req: Request, res: Response): Promise<void> {
     try {
-      const token = (req.headers as ILogoutHeader).authorization?.replace('Bearer ', '');
+      const token = req.headers.authorization?.replace('Bearer ', '');
       
       if (!token) {
         const response: ISessionResponse = {

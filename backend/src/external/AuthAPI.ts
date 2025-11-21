@@ -1,11 +1,7 @@
 import axios from 'axios';
 
-interface ILoginResponse {
-    user: {
-        userId: number;
-        email: string;
-        role: string;
-    };
+interface IExternalLoginResponse {
+    email: string;
     token: string;
 }
 
@@ -15,9 +11,22 @@ interface ILoginParams {
 }
 
 export class AuthAPI {
-    async login({email, password}: ILoginParams): Promise<ILoginResponse | null> {
-        const response = await axios.post(`http://${process.env.AUTENTICATION_SERVICE}/login`, { email, password });
-        return response.data;
+    async login({email, password}: ILoginParams): Promise<IExternalLoginResponse | null> {
+        try {
+            const response = await axios.post(`http://${process.env.AUTENTICATION_SERVICE}/login`, { 
+                email, 
+                password 
+            });
+            
+            if (response.status === 200 && response.data) {
+                return response.data;
+            }
+            
+            return null;
+        } catch (error) {
+            console.error('Erro ao fazer login no AuthAPI:', error);
+            return null;
+        }
     }
 }
 
