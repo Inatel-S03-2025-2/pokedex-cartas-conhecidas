@@ -9,10 +9,9 @@ export class PrismaCardRepository implements ICardRepository {
     this.prisma = prisma;
   }
 
-  async findByUserId(userId: number): Promise<ICard[] | []> {
+  async findByUserId(userId: number): Promise<ICard[]> {
     return await this.prisma.card.findMany({
-      where: { userId },
-      include: { user: true }
+      where: { userId }
     });
   }
 
@@ -33,7 +32,7 @@ export class PrismaCardRepository implements ICardRepository {
     });
   }
 
-  async findAll(): Promise<ICard[] | []> {
+  async findAll(): Promise<ICard[]> {
     return await this.prisma.card.findMany({
       include: { user: true }
     });
