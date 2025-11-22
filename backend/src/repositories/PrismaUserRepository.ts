@@ -27,9 +27,9 @@ export class PrismaUserRepository implements IUserRepository {
     });
   }
 
-  async findByInternalToken(internalToken: string): Promise<IUser | null> {
+  async findByExternalToken(externalToken: string): Promise<IUser | null> {
     return await this.prisma.user.findUnique({
-      where: { internalToken }
+      where: { externalToken }
     });
   }
 
@@ -45,7 +45,7 @@ export class PrismaUserRepository implements IUserRepository {
         username: data.username,
         email: data.email,
         role: data.role,
-        internalToken: data.internalToken
+        externalToken: data.externalToken
       }
     });
   }
@@ -57,19 +57,19 @@ export class PrismaUserRepository implements IUserRepository {
     });
   }
 
-  async updateInternalToken(userId: number, internalToken: string | null): Promise<IUser> {
+  async updateExternalToken(userId: number, externalToken: string | null): Promise<IUser> {
     return await this.prisma.user.update({
       where: { userId },
-      data: { internalToken }
+      data: { externalToken }
     });
   }
 
-  async updateBothTokens(userId: number, token: string | null, internalToken: string | null): Promise<IUser> {
+  async updateBothTokens(userId: number, token: string | null, externalToken: string | null): Promise<IUser> {
     return await this.prisma.user.update({
       where: { userId },
       data: { 
         token,
-        internalToken
+        externalToken
       }
     });
   }

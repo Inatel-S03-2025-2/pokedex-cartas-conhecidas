@@ -8,9 +8,9 @@ export class UserService {
   async createSession(email: string, password: string): Promise<ICreateSessionResponse | null> {
     try {
       // 1. Tentar login no serviço de autenticação externo
-      const { internalToken} = await authAPI.login(email, password);
+      const { externalToken} = await authAPI.login(email, password);
       
-      if (!internalToken) {
+      if (!externalToken) {
         Logger.info('External authentication failed', { email, reason: 'Invalid credentials or service unavailable' });
         return null; // Credenciais inválidas ou serviço indisponível
       }
@@ -24,10 +24,10 @@ export class UserService {
           username: email.split('@')[0], // Usar parte do email como username
           email: email,
           role: 'user',
-          internalToken
+          externalToken
         });
       } else {
-        user = await userRepository.updateInternalToken(user.userId, internalToken);
+        user = await userRepository.updateExternalToken(user.userId, externalToken);
       }
 
       // 3. Gerar JWT interno da nossa aplicação
@@ -53,7 +53,7 @@ export class UserService {
         return false;
       }
 
-      // Invalidar apenas o JWT interno, manter internalToken
+      // Invalidar apenas o JWT interno, manter externalToken
       await userRepository.updateToken(tokenData.userId, null);
       return true;
     } catch (error) {

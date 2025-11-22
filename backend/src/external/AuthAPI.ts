@@ -3,7 +3,7 @@ import { Logger } from '../utils/Logger';
 import { IUser } from '../models/User'; 
 
 export class AuthAPI {
-    async login(email: string, password: string): Promise<Pick<IUser, 'internalToken'>> {
+    async login(email: string, password: string): Promise<Pick<IUser, 'externalToken'>> {
         try {
             const response = await axios.post(`http://${process.env.AUTENTICATION_SERVICE}/login`, { 
                 email, 
@@ -15,10 +15,10 @@ export class AuthAPI {
                 return response.data;
             }
             Logger.info('AuthAPI login failed', { email, status: response.status });
-            return { internalToken: null };
+            return { externalToken: null };
         } catch (error) {
             Logger.externalAPIError('AuthAPI', '/login', error as Error);
-            return { internalToken: null };
+            return { externalToken: null };
         }
     }
 }

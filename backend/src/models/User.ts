@@ -4,7 +4,7 @@ export interface IUser {
   email: string;
   role: string;
   token: string | null; // JWT interno
-  internalToken: string | null; // Token do serviço externo
+  externalToken: string | null; // Token do serviço externo
   createdAt: Date;
   updatedAt: Date;
 }
