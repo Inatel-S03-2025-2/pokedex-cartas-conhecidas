@@ -8,10 +8,11 @@ export class UserService {
   async createSession(email: string, password: string): Promise<ICreateSessionResponse | null> {
     try {
       // 1. Tentar login no serviço de autenticação externo
-      const authResponse = await authAPI.login(email, password);
+      const { internalToken} = await authAPI.login(email, password);
       
-      if (!authResponse) {
-        return null; // Credenciais inválidas
+      if (!internalToken) {
+        Logger.info('External authentication failed', { email, reason: 'Invalid credentials or service unavailable' });
+        return null; // Credenciais inválidas ou serviço indisponível
       }
 
       // 2. Buscar ou criar usuário no nosso banco
@@ -20,26 +21,24 @@ export class UserService {
       if (!user) {
         // Criar novo usuário com dados da AuthAPI
         user = await userRepository.create({
-          username: authResponse.email.split('@')[0], // Usar parte do email como username
-          email: authResponse.email,
-          role: 'user', // Usuários externos sempre são 'user'
-          internalToken: authResponse.token
+          username: email.split('@')[0], // Usar parte do email como username
+          email: email,
+          role: 'user',
+          internalToken
         });
       } else {
-        // Atualizar internalToken do usuário existente
-        await userRepository.updateInternalToken(user.userId, authResponse.token);
-        user.internalToken = authResponse.token;
+        user = await userRepository.updateInternalToken(user.userId, internalToken);
       }
 
       // 3. Gerar JWT interno da nossa aplicação
-      const internalJWT = tokenManager.generateToken(user.userId, user.role);
+      const token = tokenManager.generateToken(user.userId, user.role);
 
       // 4. Salvar JWT interno no banco
-      await userRepository.updateToken(user.userId, internalJWT);
+      await userRepository.updateToken(user.userId, token);
 
       return {
         user,
-        token: internalJWT
+        token: token
       };
     } catch (error) {
       Logger.serviceError('UserService', 'createSession', error as Error, { email });
