@@ -2,7 +2,7 @@ import { userRepository } from '../repositories';
 import { tokenManager } from './JTWService';
 import { authAPI } from '../external/AuthAPI';
 import { Logger } from '../utils/Logger';
-import { ICreateSessionResponse } from '../interfaces';
+import { ICreateSessionResponse, IVerifyTokenResponse } from '../interfaces';
 
 export class UserService {
   async createSession(email: string, password: string): Promise<ICreateSessionResponse | null> {
@@ -12,14 +12,13 @@ export class UserService {
       
       if (!externalToken) {
         Logger.info('External authentication failed', { email, reason: 'Invalid credentials or service unavailable' });
-        return null; // Credenciais inválidas ou serviço indisponível
+        return null;
       }
 
       // 2. Buscar ou criar usuário no nosso banco
       let user = await userRepository.findByEmail(email);
       
       if (!user) {
-        // Criar novo usuário com dados da AuthAPI
         user = await userRepository.create({
           username: email.split('@')[0], // Usar parte do email como username
           email: email,
@@ -48,13 +47,15 @@ export class UserService {
 
   async deleteSession(token: string): Promise<boolean> {
     try {
-      const tokenData = await tokenManager.verifyToken(token);
-      if (!tokenData) {
+      const { isValid, payload } = await tokenManager.verifyToken(token) as IVerifyTokenResponse;
+      
+      if (!isValid || !payload) {
+        Logger.info('Invalid token provided for session deletion', { token });
         return false;
       }
 
       // Invalidar apenas o JWT interno, manter externalToken
-      await userRepository.updateToken(tokenData.userId, null);
+      await userRepository.updateToken(payload.userId, null);
       return true;
     } catch (error) {
       Logger.serviceError('UserService', 'deleteSession', error as Error);
