@@ -1,25 +1,11 @@
 import { Response } from 'express';
 import { cardService } from '../services/CardService';
 import { AuthRequest } from '../middlewares/authMiddleware';
-
-interface IListCardsByUserIdParams {
-  userId: string;
-}
-
-interface IListCardsResponse {
-  success: boolean;
-  data?: any[];
-  message?: string;
-}
+import { ApiResponse } from '../utils/ApiResponse';
 
 interface IMarkAsKnownBody {
   userId: number;
-  cardId: number; // id externo da PokeAPI
-}
-
-interface IMarkAsKnownResponse {
-  success: boolean;
-  message: string;
+  cardId: number;
 }
 
 export class CardController {
@@ -28,35 +14,18 @@ export class CardController {
       const { userId, cardId }: IMarkAsKnownBody = req.body;
 
       if (!userId || !cardId) {
-        const response: IMarkAsKnownResponse = {
-          success: false,
-          message: 'userId e cardId são obrigatórios.'
-        };
-        res.status(400).json(response);
-        return;
+        return ApiResponse.badRequest(res, 'userId e cardId são obrigatórios.');
       }
 
       const success = await cardService.markAsKnown(cardId, userId);
       
       if (success) {
-        const response: IMarkAsKnownResponse = {
-          success: true,
-          message: 'Carta marcada como conhecida.'
-        };
-        res.json(response);
+        return ApiResponse.success(res, 'Carta marcada como conhecida.');
       } else {
-        const response: IMarkAsKnownResponse = {
-          success: false,
-          message: 'Erro ao marcar carta como conhecida.'
-        };
-        res.status(400).json(response);
+        return ApiResponse.badRequest(res, 'Erro ao marcar carta como conhecida.');
       }
     } catch (error) {
-      const response: IMarkAsKnownResponse = {
-        success: false,
-        message: 'Erro interno do servidor.'
-      };
-      res.status(500).json(response);
+      return ApiResponse.internalError(res);
     }
   }
 
@@ -66,34 +35,18 @@ export class CardController {
 
       const cards = await cardService.listCardsByUserId(parseInt(userId));
       
-      const response: IListCardsResponse = {
-        success: true,
-        data: cards
-      };
-      res.json(response);
+      return ApiResponse.success(res, 'Cartas listadas com sucesso', cards);
     } catch (error) {
-      const response: IListCardsResponse = {
-        success: false,
-        message: 'Erro interno do servidor'
-      };
-      res.status(500).json(response);
+      return ApiResponse.internalError(res);
     }
   }
 
   async listAllCards(req: AuthRequest, res: Response): Promise<void> {
     try {
       const cards = await cardService.listAllCards();
-      const response: IListCardsResponse = {
-        success: true,
-        data: cards
-      };
-      res.json(response);
+      return ApiResponse.success(res, 'Todas as cartas listadas com sucesso', cards);
     } catch (error) {
-      const response: IListCardsResponse = {
-        success: false,
-        message: 'Erro interno do servidor'
-      };
-      res.status(500).json(response);
+      return ApiResponse.internalError(res);
     }
   }
 }

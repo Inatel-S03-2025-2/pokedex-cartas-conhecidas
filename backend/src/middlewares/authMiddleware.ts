@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { tokenManager } from '../services/JTWService';
+import { ApiResponse } from '../utils/ApiResponse';
 
 export interface AuthRequest extends Request {
   user?: {
@@ -17,20 +18,14 @@ export async function authMiddleware(
     const token = req.headers.authorization?.replace('Bearer ', '');
     
     if (!token) {
-      res.status(401).json({
-        success: false,
-        message: 'Token não fornecido'
-      });
+      ApiResponse.unauthorized(res, 'Token não fornecido');
       return;
     }
 
     // Verificar se o token é válido
     const tokenData = await tokenManager.verifyToken(token);
     if (!tokenData) {
-      res.status(401).json({
-        success: false,
-        message: 'Token inválido'
-      });
+      ApiResponse.unauthorized(res, 'Token inválido');
       return;
     }
 
@@ -42,9 +37,6 @@ export async function authMiddleware(
 
     next();
   } catch (error) {
-    res.status(401).json({
-      success: false,
-      message: 'Token inválido'
-    });
+    ApiResponse.unauthorized(res, 'Token inválido');
   }
 }

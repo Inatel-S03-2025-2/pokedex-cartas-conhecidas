@@ -1,28 +1,18 @@
 import { Response, NextFunction } from 'express';
 import { AuthRequest } from './authMiddleware';
-
-interface IRoleMiddleware {
-  success: boolean;
-  message: string;
-}
+import { ApiResponse } from '../utils/ApiResponse';
 
 export function roleMiddleware(allowedRoles: string[]) {
   return (req: AuthRequest, res: Response, next: NextFunction): void => {
     if (!req.user) {
-      res.status(401).json({
-        success: false,
-        message: 'Usuário não autenticado'
-      } as IRoleMiddleware);
+      ApiResponse.unauthorized(res, 'Usuário não autenticado');
       return;
     }
 
     console.log(`Verificando role do usuário: ${req.user.role} contra permitidas: ${allowedRoles.join(', ')}`);
 
     if (!allowedRoles.includes(req.user.role)) {
-      res.status(403).json({
-        success: false,
-        message: 'Acesso negado: role insuficiente'
-      } as IRoleMiddleware);
+      ApiResponse.error(res, 'Acesso negado: role insuficiente', 403);
       return;
     }
 

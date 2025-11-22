@@ -54,15 +54,22 @@ DATABASE_URL="file:./dev.db"
 AUTENTICATION_SERVICE=localhost:4000
 ```
 
-### Error Response Format
-All endpoints follow standardized format:
+### Response Factory Pattern
+All API responses use the `ApiResponse` utility class from `utils/ApiResponse.ts`:
 ```typescript
-{
-  success: boolean,
-  message: string,
-  data?: any  // Only on success
-}
+// Success responses
+ApiResponse.success(res, 'Operation successful', data);
+
+// Error responses 
+ApiResponse.badRequest(res, 'Invalid input');
+ApiResponse.unauthorized(res, 'Token required');
+ApiResponse.notFound(res, 'Resource not found');
+ApiResponse.internalError(res);
 ```
+- **Static Factory Methods**: Each method creates a specific type of standardized response
+- **Utility Pattern**: Centralized helper for common HTTP response creation
+- **Consistent Format**: `{success: boolean, message: string, data?: any}`
+- **Semantic Methods**: Clear intent with proper HTTP status codes
 
 ### Middleware Chain Pattern
 Routes use: `authMiddleware` → `roleMiddleware` (if needed) → controller
@@ -108,3 +115,4 @@ Card.user → User (optional, cascade delete)
 - `repositories/`: Data access abstraction
 - `middlewares/`: Request preprocessing (auth, validation)
 - `external/`: Third-party service integrations
+- `utils/`: Shared utilities

@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { apiRoutes } from './routes';
-import { HttpStatusCode } from 'axios';
+import { ApiResponse } from './utils/ApiResponse';
 
 dotenv.config();
 
@@ -24,18 +24,12 @@ app.use('/', apiRoutes);
 // Error handling
 app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
   console.error(err.stack);
-  res.status(HttpStatusCode.InternalServerError).json({
-    success: false,
-    message: 'Erro interno do servidor'
-  });
+  ApiResponse.internalError(res);
 });
 
 // 404 handler
 app.use('*', (req, res) => {
-  res.status(HttpStatusCode.NotFound).json({
-    success: false,
-    message: 'Endpoint não encontrado'
-  });
+  ApiResponse.notFound(res, 'Endpoint não encontrado');
 });
 
 app.listen(process.env.PORT, () => {

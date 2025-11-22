@@ -1,23 +1,20 @@
 import { Request, Response } from 'express';
 import { userService } from '../services/UserService';
+import { ApiResponse } from '../utils/ApiResponse';
 
 interface ILoginBody {
   email: string;
   password: string;
 }
 
-interface ISessionResponse {
-  success: boolean;
-  message: string;
-  data?: {
-    user: {
-      userId: number;
-      username: string;
-      email: string;
-      role: string;
-    };
-    token: string;
+interface ISessionData {
+  user: {
+    userId: number;
+    username: string;
+    email: string;
+    role: string;
   };
+  token: string;
 }
 
 export class UserController {
@@ -26,41 +23,24 @@ export class UserController {
       const { email, password } = req.body as ILoginBody;
 
       if (!email || !password) {
-        const response: ISessionResponse = {
-          success: false,
-          message: 'Os campos "email" e "password" são obrigatórios.'
-        };
-        res.status(400).json(response);
-        return;
+        return ApiResponse.badRequest(res, 'Os campos "email" e "password" são obrigatórios.');
       }
 
       const result = await userService.createSession({ email, password });
       
       if (!result) {
-        const response: ISessionResponse = {
-          success: false,
-          message: 'Credenciais inválidas ou erro no serviço de autenticação.'
-        };
-        res.status(401).json(response);
-        return;
+        return ApiResponse.unauthorized(res, 'Credenciais inválidas ou erro no serviço de autenticação.');
       }
 
-      const response: ISessionResponse = {
-        success: true,
-        message: 'Login realizado com sucesso',
-        data: {
-          user: result.user,
-          token: result.token
-        }
+      const sessionData: ISessionData = {
+        user: result.user,
+        token: result.token
       };
-      res.json(response);
+      
+      return ApiResponse.success(res, 'Login realizado com sucesso', sessionData);
     } catch (error) {
       console.error('Erro no login:', error);
-      const response: ISessionResponse = {
-        success: false,
-        message: 'Erro interno do servidor'
-      };
-      res.status(500).json(response);
+      return ApiResponse.internalError(res);
     }
   }
 
@@ -69,35 +49,18 @@ export class UserController {
       const token = req.headers.authorization?.replace('Bearer ', '');
       
       if (!token) {
-        const response: ISessionResponse = {
-          success: false,
-          message: 'Token não fornecido'
-        };
-        res.status(400).json(response);
-        return;
+        return ApiResponse.badRequest(res, 'Token não fornecido');
       }
 
       const success = await userService.deleteSession(token);
       
       if (success) {
-        const response: ISessionResponse = {
-          success: true,
-          message: 'Logout realizado com sucesso'
-        };
-        res.json(response);
+        return ApiResponse.success(res, 'Logout realizado com sucesso');
       } else {
-        const response: ISessionResponse = {
-          success: false,
-          message: 'Token inválido. Não foi possível realizar logout.'
-        };
-        res.status(400).json(response);
+        return ApiResponse.badRequest(res, 'Token inválido. Não foi possível realizar logout.');
       }
     } catch (error) {
-      const response: ISessionResponse = {
-        success: false,
-        message: 'Erro interno do servidor'
-      };
-      res.status(500).json(response);
+      return ApiResponse.internalError(res);
     }
   }
 }
