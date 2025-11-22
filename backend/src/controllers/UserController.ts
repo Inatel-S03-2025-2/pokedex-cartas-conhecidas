@@ -25,7 +25,6 @@ export class UserController {
       
       return ApiResponse.success(res, 'Login realizado com sucesso', sessionData);
     } catch (error) {
-      console.error('Erro no login:', error);
       return ApiResponse.internalError(res);
     }
   }

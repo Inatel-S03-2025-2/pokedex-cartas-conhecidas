@@ -22,7 +22,6 @@ export class CardService {
 
       return true;
     } catch (error) {
-      console.error('Erro ao marcar carta como conhecida:', error);
       return false;
     }
   }
@@ -32,7 +31,6 @@ export class CardService {
       const cards = await cardRepository.findByUserId(userId);
       return cards;
     } catch (error) {
-      console.error('Erro ao listar cartas por usuário:', error);
       return [];
     }
   }
@@ -42,7 +40,6 @@ export class CardService {
       const cards = await cardRepository.findAll();
       return cards;
     } catch (error) {
-      console.error('Erro ao listar todas as cartas:', error);
       return [];
     }
   }

@@ -9,8 +9,6 @@ export function roleMiddleware(allowedRoles: string[]) {
       return;
     }
 
-    console.log(`Verificando role do usuário: ${req.user.role} contra permitidas: ${allowedRoles.join(', ')}`);
-
     if (!allowedRoles.includes(req.user.role)) {
       ApiResponse.error(res, 'Acesso negado: role insuficiente', 403);
       return;

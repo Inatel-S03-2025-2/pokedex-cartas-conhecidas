@@ -19,7 +19,6 @@ export class AuthAPI {
             
             return null;
         } catch (error) {
-            console.error('Erro ao fazer login no AuthAPI:', error);
             return null;
         }
     }

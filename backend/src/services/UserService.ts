@@ -42,7 +42,6 @@ export class UserService {
         token: internalJWT
       };
     } catch (error) {
-      console.error('Erro no login:', error);
       return null;
     }
   }
@@ -58,7 +57,6 @@ export class UserService {
       await userRepository.updateToken(tokenData.userId, null);
       return true;
     } catch (error) {
-      console.error('Erro no logout:', error);
       return false;
     }
   }
