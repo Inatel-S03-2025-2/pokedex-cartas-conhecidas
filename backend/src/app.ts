@@ -3,17 +3,11 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { apiRoutes } from './routes';
 import { ApiResponse } from './utils/ApiResponse';
+import { checkMissingEnvVars } from './utils/checkMissingEnvVars';
 
 dotenv.config();
-
-// Validate required environment variables
-const requiredEnvVars = ['PORT', 'JWT_SECRET', 'NODE_ENV', 'DATABASE_URL'];
-const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
-
-if (missingVars.length > 0) {
-  console.error(`Missing required environment variables: ${missingVars.join(', ')}`);
-  console.error('Please add them to your .env file or environment configuration.');
-  process.exit(1);
+if(checkMissingEnvVars()) {
+  throw new Error('Missing required environment variables. Please check the .env file.');
 }
 
 const app = express();
