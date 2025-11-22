@@ -1,4 +1,5 @@
 import { cardRepository } from '../repositories';
+import { Logger } from '../utils/Logger';
 import { ICard } from '../models/Card';
 
 export class CardService {
@@ -22,6 +23,7 @@ export class CardService {
 
       return true;
     } catch (error) {
+      Logger.serviceError('CardService', 'markAsKnown', error as Error, { cardId, userId });
       return false;
     }
   }
@@ -31,6 +33,7 @@ export class CardService {
       const cards = await cardRepository.findByUserId(userId);
       return cards;
     } catch (error) {
+      Logger.serviceError('CardService', 'listCardsByUserId', error as Error, { userId });
       return [];
     }
   }
@@ -40,6 +43,7 @@ export class CardService {
       const cards = await cardRepository.findAll();
       return cards;
     } catch (error) {
+      Logger.serviceError('CardService', 'listAllCards', error as Error);
       return [];
     }
   }

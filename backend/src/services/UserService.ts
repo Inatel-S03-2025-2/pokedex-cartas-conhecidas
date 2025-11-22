@@ -1,8 +1,8 @@
 import { userRepository } from '../repositories';
 import { tokenManager } from './JTWService';
 import { authAPI } from '../external/AuthAPI';
+import { Logger } from '../utils/Logger';
 import { ICreateSessionResponse } from '../interfaces';
-import { IUser } from '../models/User';
 
 export class UserService {
   async createSession(email: string, password: string): Promise<ICreateSessionResponse | null> {
@@ -42,6 +42,7 @@ export class UserService {
         token: internalJWT
       };
     } catch (error) {
+      Logger.serviceError('UserService', 'createSession', error as Error, { email });
       return null;
     }
   }
@@ -57,6 +58,7 @@ export class UserService {
       await userRepository.updateToken(tokenData.userId, null);
       return true;
     } catch (error) {
+      Logger.serviceError('UserService', 'deleteSession', error as Error);
       return false;
     }
   }

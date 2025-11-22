@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
 import { userRepository } from '../repositories';
-import { IUser } from '../models/User';
+import { Logger } from '../utils/Logger';
+
 
 export class JWTService {
   private jwtSecret = process.env.JWT_SECRET!;
@@ -35,6 +36,7 @@ export class JWTService {
         role: user.role
       };
     } catch (error) {
+      Logger.serviceError('JWTService', 'verifyToken', error as Error);
       return null;
     }
   }

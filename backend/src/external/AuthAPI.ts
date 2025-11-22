@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { Logger } from '../utils/Logger';
 
 export interface IExternalLoginResponse {
   email: string;
@@ -14,12 +15,14 @@ export class AuthAPI {
             });
             
             if (response.status === 200 && response.data) {
+Logger.info('AuthAPI login successful', { email });
                 return response.data;
             }
-            
-            return null;
+Logger.info('AuthAPI login failed', { email, status: response.status });            
+            return { internalToken: null };
         } catch (error) {
-            return null;
+            Logger.externalAPIError('AuthAPI', '/login', error as Error);
+            return { internalToken: null };
         }
     }
 }

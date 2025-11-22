@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { userService } from '../services/UserService';
 import { ApiResponse } from '../utils/ApiResponse';
+import { Logger } from '../utils/Logger';
 import { ILoginRequest, ILoginResponse } from '../interfaces';
 
 export class UserController {
@@ -25,6 +26,8 @@ export class UserController {
       
       return ApiResponse.success(res, 'Login realizado com sucesso', sessionData);
     } catch (error) {
+      const { email } = req.body as ILoginRequest;
+      Logger.authError('login', email, error as Error);
       return ApiResponse.internalError(res);
     }
   }
@@ -45,6 +48,7 @@ export class UserController {
         return ApiResponse.badRequest(res, 'Token inválido. Não foi possível realizar logout.');
       }
     } catch (error) {
+      Logger.authError('logout', undefined, error as Error);
       return ApiResponse.internalError(res);
     }
   }
