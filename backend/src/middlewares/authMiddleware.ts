@@ -4,7 +4,6 @@ import { tokenManager } from '../services/JTWService';
 export interface AuthRequest extends Request {
   user?: {
     userId: number;
-    username: string;
     role: string;
   };
 }
@@ -38,7 +37,6 @@ export async function authMiddleware(
     // Adicionar dados do usuário à requisição (diretamente do token)
     req.user = {
       userId: tokenData.userId,
-      username: `user-${tokenData.userId}`, // Placeholder para username
       role: tokenData.role
     };
 
