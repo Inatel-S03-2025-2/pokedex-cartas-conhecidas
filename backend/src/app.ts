@@ -40,10 +40,12 @@ app.use('*', (req, res) => {
 });
 
 app.listen(process.env.PORT, () => {
-  console.log(`Server running on http://localhost:${process.env.PORT}`);
-  console.log(`API Documentation: http://localhost:${process.env.PORT}/api-docs`);
-  console.log(`Health Check: http://localhost:${process.env.PORT}/health`);
-  console.log(`Environment: ${process.env.NODE_ENV}`);
+  // eslint-disable-next-line no-console
+  console.log(
+  `Server running on http://localhost:${process.env.PORT}`,
+  `API Documentation: http://localhost:${process.env.PORT}/api-docs`, 
+  `Health Check: http://localhost:${process.env.PORT}/health`,
+  `Environment: ${process.env.NODE_ENV}`);
 });
 
 
