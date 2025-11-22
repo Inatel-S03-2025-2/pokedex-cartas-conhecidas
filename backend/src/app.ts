@@ -1,9 +1,11 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import swaggerUi from 'swagger-ui-express';
 import { apiRoutes } from './routes';
 import { ApiResponse } from './utils/ApiResponse';
 import { checkMissingEnvVars } from './utils/checkMissingEnvVars';
+import { swaggerSpec, swaggerHealthCheck } from './config/swagger';
 
 dotenv.config();
 if(checkMissingEnvVars()) {
@@ -13,6 +15,18 @@ if(checkMissingEnvVars()) {
 const app = express();
 app.use(express.json());
 app.use(cors());
+
+// Swagger Documentation
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+  customCss: '.swagger-ui .topbar { display: none }',
+  customSiteTitle: 'Pokédex API Documentation'
+}));
+app.get('/swagger.json', (req, res) => {
+  res.setHeader('Content-Type', 'application/json');
+  res.send(swaggerSpec);
+});
+app.get('/health', swaggerHealthCheck);
+
 app.use('/', apiRoutes);
 
 // Error handling
@@ -26,7 +40,9 @@ app.use('*', (req, res) => {
 });
 
 app.listen(process.env.PORT, () => {
-  console.log(`Running on http://localhost:${process.env.PORT}`);
+  console.log(`Server running on http://localhost:${process.env.PORT}`);
+  console.log(`API Documentation: http://localhost:${process.env.PORT}/api-docs`);
+  console.log(`Health Check: http://localhost:${process.env.PORT}/health`);
   console.log(`Environment: ${process.env.NODE_ENV}`);
 });
 
