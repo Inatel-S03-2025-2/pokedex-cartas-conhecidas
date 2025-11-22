@@ -16,8 +16,7 @@ app.use(cors());
 app.use('/', apiRoutes);
 
 // Error handling
-app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  console.error(err.stack);
+app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
   ApiResponse.internalError(res);
 });
 
