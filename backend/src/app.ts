@@ -42,10 +42,10 @@ app.use('*', (req, res) => {
 app.listen(process.env.PORT, () => {
   // eslint-disable-next-line no-console
   console.log(
-  `Server running on http://localhost:${process.env.PORT}`,
-  `API Documentation: http://localhost:${process.env.PORT}/api-docs`, 
-  `Health Check: http://localhost:${process.env.PORT}/health`,
-  `Environment: ${process.env.NODE_ENV}`);
+  `Server running on http://localhost:${process.env.PORT}\n`,
+  `API Documentation: http://localhost:${process.env.PORT}/api-docs\n`, 
+  `Health Check: http://localhost:${process.env.PORT}/health\n`,
+  `Environment: ${process.env.NODE_ENV}\n`);
 });
 
 
