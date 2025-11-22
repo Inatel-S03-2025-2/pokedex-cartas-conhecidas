@@ -1,6 +1,6 @@
 import { Response } from 'express';
 
-export interface IApiResponse<T = any> {
+export interface IApiResponse<T> {
   success: boolean;
   message: string;
   data?: T;
@@ -17,7 +17,7 @@ export class ApiResponse {
   }
 
   static error(res: Response, message: string, statusCode: number = 400): void {
-    const response: IApiResponse = {
+    const response: IApiResponse<never> = {
       success: false,
       message
     };
