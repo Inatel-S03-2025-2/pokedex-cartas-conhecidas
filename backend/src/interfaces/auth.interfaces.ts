@@ -14,3 +14,5 @@ export interface ILoginResponse extends Pick<IUser, "token"> {
 export interface ICreateSessionResponse extends Pick<IUser, 'token'> {
     user: IUser;
 }
+
+export interface IExternalLoginResponse extends Pick<IUser, 'externalToken'> {}

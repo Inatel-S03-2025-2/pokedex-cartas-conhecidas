@@ -1,9 +1,9 @@
 import axios from 'axios';
 import { Logger } from '../utils/Logger';
-import { IUser } from '../models/User'; 
+import { IExternalLoginResponse } from '../interfaces';
 
 export class AuthAPI {
-    async login(email: string, password: string): Promise<Pick<IUser, 'externalToken'>> {
+    async login(email: string, password: string): Promise<IExternalLoginResponse> {
         try {
             const response = await axios.post(`http://${process.env.AUTENTICATION_SERVICE}/login`, { 
                 email, 

@@ -8,7 +8,7 @@ export class UserService {
   async createSession(email: string, password: string): Promise<ICreateSessionResponse | null> {
     try {
       // 1. Tentar login no serviço de autenticação externo
-      const { externalToken} = await authAPI.login(email, password);
+      const { externalToken } = await authAPI.login(email, password);
       
       if (!externalToken) {
         Logger.info('External authentication failed', { email, reason: 'Invalid credentials or service unavailable' });
