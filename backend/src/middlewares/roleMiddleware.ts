@@ -19,7 +19,7 @@ export function roleMiddleware(allowedRoles: string[]) {
 }
 
 // Middlewares específicos para cada tipo de acesso
-export const internalMiddleware = roleMiddleware(['internal']);
-export const internalAdminMiddleware = roleMiddleware(['internalAdmin']); 
+export const markerRoleMiddleware = roleMiddleware(['marker']);
+export const viewerRoleMiddleware = roleMiddleware(['viewer']); 
 export const userMiddleware = roleMiddleware(['user']);
-export const allRolesMiddleware = roleMiddleware(['internal', 'internalAdmin', 'user']);
+export const allRolesMiddleware = roleMiddleware(['marker', 'viewer', 'user']);

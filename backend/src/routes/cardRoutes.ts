@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { cardController } from '../controllers/CardController';
 import { authMiddleware } from '../middlewares/authMiddleware';
-import { internalMiddleware, internalAdminMiddleware, userMiddleware } from '../middlewares/roleMiddleware';
+import { markerRoleMiddleware, viewerRoleMiddleware, userMiddleware } from '../middlewares/roleMiddleware';
 
 const router = Router();
 
@@ -13,7 +13,7 @@ router.use(authMiddleware);
  * /cards/marked:
  *   post:
  *     summary: Marcar carta como conhecida
- *     description: Marca uma carta específica como conhecida pelo usuário (apenas role "internal")
+ *     description: Marca uma carta específica como conhecida pelo usuário (apenas role "marker")
  *     tags: [Cartas]
  *     security:
  *       - bearerAuth: []
@@ -55,7 +55,7 @@ router.use(authMiddleware);
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  *       403:
- *         description: Role insuficiente (requer "internal")
+ *         description: Role insuficiente (requer "marker")
  *         content:
  *           application/json:
  *             schema:
@@ -67,14 +67,14 @@ router.use(authMiddleware);
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
-router.post('/marked', internalMiddleware, cardController.markAsKnown.bind(cardController));
+router.post('/marked', markerRoleMiddleware, cardController.markAsKnown.bind(cardController));
 
 /**
  * @swagger
  * /cards:
  *   get:
  *     summary: Listar todas as cartas conhecidas
- *     description: Retorna todas as cartas marcadas como conhecidas no sistema (apenas role "internalAdmin")
+ *     description: Retorna todas as cartas marcadas como conhecidas no sistema (apenas role "viewer")
  *     tags: [Cartas]
  *     security:
  *       - bearerAuth: []
@@ -103,7 +103,7 @@ router.post('/marked', internalMiddleware, cardController.markAsKnown.bind(cardC
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  *       403:
- *         description: Role insuficiente (requer "internalAdmin")
+ *         description: Role insuficiente (requer "viewer")
  *         content:
  *           application/json:
  *             schema:
@@ -115,7 +115,7 @@ router.post('/marked', internalMiddleware, cardController.markAsKnown.bind(cardC
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
-router.get('/', internalAdminMiddleware, cardController.listAllCards.bind(cardController));
+router.get('/', viewerRoleMiddleware, cardController.listAllCards.bind(cardController));
 
 /**
  * @swagger

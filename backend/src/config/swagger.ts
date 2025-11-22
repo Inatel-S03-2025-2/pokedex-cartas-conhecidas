@@ -51,7 +51,7 @@ const options: swaggerJSDoc.Options = {
             },
             role: {
               type: 'string',
-              enum: ['user', 'internal', 'internalAdmin'],
+              enum: ['user', 'marker', 'viewer'],
               description: 'Role do usuário no sistema. Determina níveis de acesso.',
               example: 'user'
             }
