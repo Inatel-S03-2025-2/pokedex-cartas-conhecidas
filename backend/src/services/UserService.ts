@@ -1,27 +1,14 @@
 import { userRepository } from '../repositories';
 import { tokenManager } from './JTWService';
 import { authAPI } from '../external/AuthAPI';
-
-interface ICreateSessionResponse {
-  user: {
-    userId: number;
-    username: string;
-    email: string;
-    role: string;
-  };
-  token: string; // JWT interno
-}
-
-interface ICreateSessionParams {
-  email: string;
-  password: string;
-}
+import { ICreateSessionResponse } from '../interfaces';
+import { IUser } from '../models/User';
 
 export class UserService {
-  async createSession({ email, password }: ICreateSessionParams): Promise<ICreateSessionResponse | null> {
+  async createSession(email: string, password: string): Promise<ICreateSessionResponse | null> {
     try {
       // 1. Tentar login no serviço de autenticação externo
-      const authResponse = await authAPI.login({ email, password });
+      const authResponse = await authAPI.login(email, password);
       
       if (!authResponse) {
         return null; // Credenciais inválidas
@@ -51,12 +38,7 @@ export class UserService {
       await userRepository.updateToken(user.userId, internalJWT);
 
       return {
-        user: {
-          userId: user.userId,
-          username: user.username,
-          email: user.email,
-          role: user.role
-        },
+        user,
         token: internalJWT
       };
     } catch (error) {

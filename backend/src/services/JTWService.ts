@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { userRepository } from '../repositories';
+import { IUser } from '../models/User';
 
 export class JWTService {
   private jwtSecret = process.env.JWT_SECRET!;

@@ -2,16 +2,12 @@ import { Response } from 'express';
 import { cardService } from '../services/CardService';
 import { AuthRequest } from '../middlewares/authMiddleware';
 import { ApiResponse } from '../utils/ApiResponse';
-
-interface IMarkAsKnownBody {
-  userId: number;
-  cardId: number;
-}
+import { IMarkAsKnownRequest, ICardResponse, IListAllCardsResponse } from '../interfaces';
 
 export class CardController {
   async markAsKnown(req: AuthRequest, res: Response): Promise<void> {
     try {
-      const { userId, cardId }: IMarkAsKnownBody = req.body;
+      const { userId, cardId }: IMarkAsKnownRequest = req.body;
 
       if (!userId || !cardId) {
         return ApiResponse.badRequest(res, 'userId e cardId são obrigatórios.');
@@ -33,7 +29,7 @@ export class CardController {
     try {
       const { userId } = req.params;
 
-      const cards = await cardService.listCardsByUserId(parseInt(userId));
+      const cards = await cardService.listCardsByUserId(parseInt(userId)) as ICardResponse[];
       
       return ApiResponse.success(res, 'Cartas listadas com sucesso', cards);
     } catch (error) {
@@ -43,7 +39,7 @@ export class CardController {
 
   async listAllCards(req: AuthRequest, res: Response): Promise<void> {
     try {
-      const cards = await cardService.listAllCards();
+      const cards = await cardService.listAllCards() as IListAllCardsResponse[];
       return ApiResponse.success(res, 'Todas as cartas listadas com sucesso', cards);
     } catch (error) {
       return ApiResponse.internalError(res);

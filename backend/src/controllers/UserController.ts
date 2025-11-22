@@ -1,38 +1,24 @@
 import { Request, Response } from 'express';
 import { userService } from '../services/UserService';
 import { ApiResponse } from '../utils/ApiResponse';
-
-interface ILoginBody {
-  email: string;
-  password: string;
-}
-
-interface ISessionData {
-  user: {
-    userId: number;
-    username: string;
-    email: string;
-    role: string;
-  };
-  token: string;
-}
+import { ILoginRequest, ILoginResponse } from '../interfaces';
 
 export class UserController {
   async login(req: Request, res: Response): Promise<void> {
     try {
-      const { email, password } = req.body as ILoginBody;
+      const { email, password } = req.body as ILoginRequest;
 
       if (!email || !password) {
         return ApiResponse.badRequest(res, 'Os campos "email" e "password" são obrigatórios.');
       }
 
-      const result = await userService.createSession({ email, password });
+      const result = await userService.createSession(email, password);
       
       if (!result) {
         return ApiResponse.unauthorized(res, 'Credenciais inválidas ou erro no serviço de autenticação.');
       }
 
-      const sessionData: ISessionData = {
+      const sessionData: ILoginResponse = {
         user: result.user,
         token: result.token
       };

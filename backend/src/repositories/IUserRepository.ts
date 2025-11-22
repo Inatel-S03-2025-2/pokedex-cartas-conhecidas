@@ -1,13 +1,4 @@
-export interface IUser {
-  userId: number;
-  username: string;
-  email: string;
-  role: string;
-  token: string | null; // JWT interno
-  internalToken: string | null; // Token do serviço externo
-  createdAt: Date;
-  updatedAt: Date;
-}
+import { IUser } from '../models/User';
 
 export interface ICreateUser {
   username: string;

@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
-import { IUserRepository, IUser, ICreateUser } from './IUserRepository';
+import { IUserRepository, ICreateUser } from './IUserRepository';
+import { IUser } from '../models/User';
 
 export class PrismaUserRepository implements IUserRepository {
   private prisma: PrismaClient;
@@ -43,7 +44,7 @@ export class PrismaUserRepository implements IUserRepository {
       data: {
         username: data.username,
         email: data.email,
-        role: data.role || 'user',
+        role: data.role,
         internalToken: data.internalToken
       }
     });

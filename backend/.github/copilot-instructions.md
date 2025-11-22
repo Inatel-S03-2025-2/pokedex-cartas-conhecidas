@@ -112,7 +112,15 @@ Card.user → User (optional, cascade delete)
 ## File Structure Significance
 - `controllers/`: Express route handlers only
 - `services/`: Business logic, external API calls
-- `repositories/`: Data access abstraction
+- `repositories/`: Data access abstraction with entity interfaces (`I*Repository.ts`)
 - `middlewares/`: Request preprocessing (auth, validation)
 - `external/`: Third-party service integrations
+- `interfaces/`: Shared DTOs and request/response interfaces
+- `utils/`: Utility classes (ApiResponse, etc.)
+
+## Interface Organization Strategy
+- **Repository interfaces**: Stay with repositories (`IUserRepository`, `IUser`)
+- **DTOs & Request/Response**: Centralized in `/interfaces/` by domain
+- **Import pattern**: `import { ILoginRequest } from '../interfaces'`
+- **Domain separation**: `auth.interfaces.ts`, `card.interfaces.ts`
 - `utils/`: Shared utilities

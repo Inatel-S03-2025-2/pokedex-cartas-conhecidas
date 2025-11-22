@@ -1,4 +1,5 @@
-import { cardRepository, userRepository } from '../repositories';
+import { cardRepository } from '../repositories';
+import { ICard } from '../models/Card';
 
 export class CardService {
   async markAsKnown(cardId: number, userId: number): Promise<boolean> {
@@ -26,31 +27,20 @@ export class CardService {
     }
   }
 
-  async listCardsByUserId(userId: number): Promise<any[]> {
+  async listCardsByUserId(userId: number): Promise<ICard[]> {
     try {
       const cards = await cardRepository.findByUserId(userId);
-      return cards.map(card => ({
-        cardId: card.cardId, // id externo da PokeAPI
-        userId: card.userId,
-        createdAt: card.createdAt,
-        updatedAt: card.updatedAt
-      }));
+      return cards;
     } catch (error) {
       console.error('Erro ao listar cartas por usuário:', error);
       return [];
     }
   }
 
-  async listAllCards(): Promise<any[]> {
+  async listAllCards(): Promise<ICard[]> {
     try {
       const cards = await cardRepository.findAll();
-      return cards.map(card => ({
-        cardId: card.cardId, // id externo da PokeAPI
-        userId: card.userId,
-        username: card.user?.username || 'Unknown',
-        createdAt: card.createdAt,
-        updatedAt: card.updatedAt
-      }));
+      return cards;
     } catch (error) {
       console.error('Erro ao listar todas as cartas:', error);
       return [];
