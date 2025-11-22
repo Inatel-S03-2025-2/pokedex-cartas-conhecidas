@@ -53,7 +53,7 @@ if (process.env.NODE_ENV === 'production') {
 
 // Helper functions for structured logging
 export class Logger {
-  static error(message: string, error?: Error, context?: Record<string, any>) {
+  static error(message: string, error?: Error, context?: Record<string, unknown>) {
     logger.error(message, {
       error: error?.message,
       stack: error?.stack,
@@ -61,15 +61,15 @@ export class Logger {
     });
   }
 
-  static warn(message: string, context?: Record<string, any>) {
+  static warn(message: string, context?: Record<string, unknown>) {
     logger.warn(message, context);
   }
 
-  static info(message: string, context?: Record<string, any>) {
+  static info(message: string, context?: Record<string, unknown>) {
     logger.info(message, context);
   }
 
-  static debug(message: string, context?: Record<string, any>) {
+  static debug(message: string, context?: Record<string, unknown>) {
     logger.debug(message, context);
   }
 
@@ -78,7 +78,7 @@ export class Logger {
     this.error(`Authentication ${action} failed`, error, { email, action });
   }
 
-  static serviceError(service: string, method: string, error?: Error, context?: Record<string, any>) {
+  static serviceError(service: string, method: string, error?: Error, context?: Record<string, unknown>) {
     this.error(`${service}.${method} failed`, error, { service, method, ...context });
   }
 
