@@ -1,78 +1,65 @@
-import bcrypt from 'bcryptjs';
-import { userModel } from '../models/UserModel';
-import { authService } from './AuthService';
+import { userRepository } from '../repositories';
+import { tokenManager } from './JTWService';
+import { authAPI } from '../external/AuthAPI';
+import { Logger } from '../utils/Logger';
+import { ICreateSessionResponse, IVerifyTokenResponse } from '../interfaces';
 
 export class UserService {
-  async createSession(login: string, password: string): Promise<{ user: any; token: string } | null> {
+  async createSession(email: string, password: string): Promise<ICreateSessionResponse | null> {
     try {
-      // Buscar usuário pelo login
-      const user = await userModel.findByLogin(login);
+      // 1. Tentar login no serviço de autenticação externo
+      const { externalToken } = await authAPI.login(email, password);
+      
+      if (!externalToken) {
+        Logger.info('External authentication failed', { email, reason: 'Invalid credentials or service unavailable' });
+        return null;
+      }
+
+      // 2. Buscar ou criar usuário no nosso banco
+      let user = await userRepository.findByEmail(email);
+      
       if (!user) {
-        return null;
+        user = await userRepository.create({
+          username: email.split('@')[0], // Usar parte do email como username
+          email: email,
+          role: 'user',
+          externalToken
+        });
+      } else {
+        user = await userRepository.updateExternalToken(user.userId, externalToken);
       }
 
-      // Verificar senha
-      const isPasswordValid = await bcrypt.compare(password, user.password);
-      if (!isPasswordValid) {
-        return null;
-      }
+      // 3. Gerar JWT interno da nossa aplicação
+      const token = tokenManager.generateToken(user.userId, user.role);
 
-      // Gerar token JWT
-      const token = authService.generateToken(user.id, user.role);
-
-      // Salvar session token no banco
-      await userModel.updateSessionToken(user.id, token);
+      // 4. Salvar JWT interno no banco
+      await userRepository.updateToken(user.userId, token);
 
       return {
-        user: {
-          id: user.id,
-          login: user.login,
-          role: user.role
-        },
-        token
+        user,
+        token: token
       };
     } catch (error) {
-      console.error('Erro no login:', error);
+      Logger.serviceError('UserService', 'createSession', error as Error, { email });
       return null;
     }
   }
 
   async deleteSession(token: string): Promise<boolean> {
     try {
-      const tokenData = await authService.verifyToken(token);
-      if (!tokenData) {
+      const { isValid, payload } = await tokenManager.verifyToken(token) as IVerifyTokenResponse;
+      
+      if (!isValid || !payload) {
+        Logger.info('Invalid token provided for session deletion', { token });
         return false;
       }
 
-      // Remover session token do banco
-      await userModel.updateSessionToken(tokenData.userId, null);
+      // Invalidar apenas o JWT interno, manter externalToken
+      await userRepository.updateToken(payload.userId, null);
       return true;
     } catch (error) {
-      console.error('Erro no logout:', error);
+      Logger.serviceError('UserService', 'deleteSession', error as Error);
       return false;
-    }
-  }
-
-  async createUser(login: string, password: string, role: string = 'user') {
-    try {
-      // Hash da senha
-      const hashedPassword = await bcrypt.hash(password, 10);
-
-      // Criar usuário
-      const user = await userModel.create({
-        login,
-        password: hashedPassword,
-        role
-      });
-
-      return {
-        id: user.id,
-        login: user.login,
-        role: user.role
-      };
-    } catch (error) {
-      console.error('Erro ao criar usuário:', error);
-      throw error;
     }
   }
 }

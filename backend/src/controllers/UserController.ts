@@ -1,41 +1,34 @@
 import { Request, Response } from 'express';
 import { userService } from '../services/UserService';
+import { ApiResponse } from '../utils/ApiResponse';
+import { Logger } from '../utils/Logger';
+import { ILoginRequest, ILoginResponse } from '../interfaces';
 
 export class UserController {
   async login(req: Request, res: Response): Promise<void> {
     try {
-      const { login, password } = req.body;
+      const { email, password } = req.body as ILoginRequest;
 
-      if (!login || !password) {
-        res.status(400).json({
-          success: false,
-          message: 'Login e senha são obrigatórios'
-        });
-        return;
+      if (!email || !password) {
+        return ApiResponse.badRequest(res, 'Os campos "email" e "password" são obrigatórios.');
       }
 
-      const result = await userService.createSession(login, password);
+      const result = await userService.createSession(email, password);
       
       if (!result) {
-        res.status(401).json({
-          success: false,
-          message: 'Credenciais inválidas'
-        });
-        return;
+        return ApiResponse.unauthorized(res, 'Credenciais inválidas ou erro no serviço de autenticação.');
       }
 
-      res.json({
-        success: true,
-        data: {
-          user: result.user,
-          token: result.token
-        }
-      });
+      const sessionData: ILoginResponse = {
+        user: result.user,
+        token: result.token
+      };
+      
+      return ApiResponse.success(res, 'Login realizado com sucesso', sessionData);
     } catch (error) {
-      res.status(500).json({
-        success: false,
-        message: 'Erro interno do servidor'
-      });
+      const { email } = req.body as ILoginRequest;
+      Logger.authError('login', email, error as Error);
+      return ApiResponse.internalError(res);
     }
   }
 
@@ -44,64 +37,19 @@ export class UserController {
       const token = req.headers.authorization?.replace('Bearer ', '');
       
       if (!token) {
-        res.status(400).json({
-          success: false,
-          message: 'Token não fornecido'
-        });
-        return;
+        return ApiResponse.badRequest(res, 'Token não fornecido');
       }
 
       const success = await userService.deleteSession(token);
       
       if (success) {
-        res.json({
-          success: true,
-          message: 'Logout realizado com sucesso'
-        });
+        return ApiResponse.success(res, 'Logout realizado com sucesso');
       } else {
-        res.status(400).json({
-          success: false,
-          message: 'Token inválido'
-        });
+        return ApiResponse.badRequest(res, 'Token inválido. Não foi possível realizar logout.');
       }
     } catch (error) {
-      res.status(500).json({
-        success: false,
-        message: 'Erro interno do servidor'
-      });
-    }
-  }
-
-  async register(req: Request, res: Response): Promise<void> {
-    try {
-      const { login, password, role } = req.body;
-
-      if (!login || !password) {
-        res.status(400).json({
-          success: false,
-          message: 'Login e senha são obrigatórios'
-        });
-        return;
-      }
-
-      const user = await userService.createUser(login, password, role);
-      
-      res.status(201).json({
-        success: true,
-        data: user
-      });
-    } catch (error: any) {
-      if (error.code === 'P2002') {
-        res.status(400).json({
-          success: false,
-          message: 'Login já existe'
-        });
-      } else {
-        res.status(500).json({
-          success: false,
-          message: 'Erro interno do servidor'
-        });
-      }
+      Logger.authError('logout', undefined, error as Error);
+      return ApiResponse.internalError(res);
     }
   }
 }

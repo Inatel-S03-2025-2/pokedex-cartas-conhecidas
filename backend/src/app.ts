@@ -1,64 +1,52 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import swaggerUi from 'swagger-ui-express';
+import { apiRoutes } from './routes';
+import { ApiResponse } from './utils/ApiResponse';
+import { checkMissingEnvVars } from './utils/checkMissingEnvVars';
+import { swaggerSpec, swaggerHealthCheck } from './config/swagger';
 
-// Import controllers
-import { userController } from './controllers/UserController';
-import { cardController } from './controllers/CardController';
-import { HttpStatusCode } from 'axios';
-
-// Load environment variables
 dotenv.config();
+if(checkMissingEnvVars()) {
+  throw new Error('Missing required environment variables. Please check the .env file.');
+}
 
 const app = express();
-
-// Middleware
 app.use(express.json());
 app.use(cors());
 
-// Health check
-app.get('/health', (req, res) => {
-  res.json({
-    status: 'ok',
-    message: 'Pokédex Backend3 SOA running',
-    timestamp: new Date().toISOString()
-  });
+// Swagger Documentation
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+  customCss: '.swagger-ui .topbar { display: none }',
+  customSiteTitle: 'Pokédex API Documentation'
+}));
+app.get('/swagger.json', (req, res) => {
+  res.setHeader('Content-Type', 'application/json');
+  res.send(swaggerSpec);
 });
+app.get('/health', swaggerHealthCheck);
 
-// Routes - Auth
-app.post('/auth/login', userController.login.bind(userController));
-app.post('/auth/logout', userController.logout.bind(userController));
-app.post('/auth/register', userController.register.bind(userController));
-
-// Routes - Cards
-app.post('/cards/known', cardController.markAsKnown.bind(cardController));
-app.get('/cards/user/:userId/pokemon-ids', cardController.listCardPokemonId.bind(cardController));
-app.get('/cards/user/:userId', cardController.listCards.bind(cardController));
-app.get('/cards/:cardId/description', cardController.getCardDescription.bind(cardController));
+app.use('/', apiRoutes);
 
 // Error handling
-app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  console.error(err.stack);
-  res.status(500).json({
-    success: false,
-    message: 'Erro interno do servidor'
-  });
+app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+  ApiResponse.internalError(res);
 });
 
 // 404 handler
 app.use('*', (req, res) => {
-  res.status(HttpStatusCode.NotFound).json({
-    success: false,
-    message: 'Endpoint não encontrado'
-  });
+  ApiResponse.notFound(res, 'Endpoint não encontrado');
 });
 
-const PORT = process.env.PORT || 3000;
-
-app.listen(PORT, () => {
-  console.log(`🚀 Backend3 SOA running on port ${PORT}`);
-  console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log('🎯 Arquitetura: SOA simples (Service-Model-Controller)');
+app.listen(process.env.PORT, () => {
+  // eslint-disable-next-line no-console
+  console.log(
+  `Server running on http://localhost:${process.env.PORT}\n`,
+  `API Documentation: http://localhost:${process.env.PORT}/api-docs\n`, 
+  `Health Check: http://localhost:${process.env.PORT}/health\n`,
+  `Environment: ${process.env.NODE_ENV}\n`);
 });
+
 
 export default app;

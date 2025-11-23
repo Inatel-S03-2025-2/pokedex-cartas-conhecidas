@@ -1,10 +1,10 @@
-# anotacoes 2025-10-31
+## Anotações 2025-10-31
 
-
-- criar pasta Utils. funcao response (responder de uma forma padronizada)
-- pedir as informacoes dos pokemons diretamente pelo frontend (nome, tipo, detalhes, etc.).
-- talvez encontrar uma segunda API com imagens de pokemons melhores.
-- comecar a integração do backend com o frontend (rotas, interfaces, etc.).
-- criar arquivo de rotas.
-- criar documentacao (swagger).
-- possivelmente criar testes unitarios, de integracao.
+- [ ] Criar pasta **Utils** para a função **response** (responder de forma padronizada).
+- [x] Pedir as informações dos Pokémon diretamente pelo frontend (nome, tipo, detalhes, etc.).
+- [x] Encontrar uma segunda API com melhores imagens de Pokémon.
+- [x] Iniciar a integração do backend com o frontend (rotas, interfaces, etc.).
+- [x] Criar arquivo de rotas.
+- [ ] Criar documentação (Swagger).
+- [ ] Possivelmente criar testes unitários e de integração.
+- [ ] No /user/register, garantir que sejam criados usuários apenas com "role" existentes (player, admin, internal)

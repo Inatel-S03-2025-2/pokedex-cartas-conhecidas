@@ -1,198 +1,48 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { cardService } from '../services/CardService';
-import { authService } from '../services/AuthService';
+import { AuthRequest } from '../middlewares/authMiddleware';
+import { ApiResponse } from '../utils/ApiResponse';
+import { IMarkAsKnownRequest, ICardResponse, IListAllCardsResponse } from '../interfaces';
 
 export class CardController {
-  async markAsKnown(req: Request, res: Response): Promise<void> {
+  async markAsKnown(req: AuthRequest, res: Response): Promise<void> {
     try {
-      const { pokeId, userId } = req.body;
-      const token = req.headers.authorization?.replace('Bearer ', '');
+      const { userId, cardId }: IMarkAsKnownRequest = req.body;
 
-      if (!token) {
-        res.status(401).json({
-          success: false,
-          message: 'Token não fornecido'
-        });
-        return;
+      if (!userId || !cardId) {
+        return ApiResponse.badRequest(res, 'userId e cardId são obrigatórios.');
       }
 
-      const tokenData = await authService.verifyToken(token);
-      if (!tokenData) {
-        res.status(401).json({
-          success: false,
-          message: 'Token inválido'
-        });
-        return;
-      }
-
-      // Usar o userId do token (segurança)
-      const userIdFromToken = tokenData.userId;
-
-      if (!pokeId) {
-        res.status(400).json({
-          success: false,
-          message: 'pokeId é obrigatório'
-        });
-        return;
-      }
-
-      const success = await cardService.updateCard(parseInt(pokeId), userIdFromToken);
+      const success = await cardService.markAsKnown(cardId, userId);
       
       if (success) {
-        res.json({
-          success: true,
-          message: 'Carta marcada como conhecida'
-        });
+        return ApiResponse.success(res, 'Carta marcada como conhecida.');
       } else {
-        res.status(400).json({
-          success: false,
-          message: 'Erro ao marcar carta como conhecida'
-        });
+        return ApiResponse.badRequest(res, 'Erro ao marcar carta como conhecida.');
       }
     } catch (error) {
-      res.status(500).json({
-        success: false,
-        message: 'Erro interno do servidor'
-      });
+      return ApiResponse.internalError(res);
     }
   }
 
-  async listCardPokemonId(req: Request, res: Response): Promise<void> {
+  async listCardsByUserId(req: AuthRequest, res: Response): Promise<void> {
     try {
       const { userId } = req.params;
-      const token = req.headers.authorization?.replace('Bearer ', '');
 
-      if (!token) {
-        res.status(401).json({
-          success: false,
-          message: 'Token não fornecido'
-        });
-        return;
-      }
-
-      const tokenData = await authService.verifyToken(token);
-      if (!tokenData) {
-        res.status(401).json({
-          success: false,
-          message: 'Token inválido'
-        });
-        return;
-      }
-
-      // Verificar se pode acessar os dados (próprio usuário ou admin)
-      const userIdFromToken = tokenData.userId;
-      const targetUserId = parseInt(userId);
-
-      if (userIdFromToken !== targetUserId && tokenData.role !== 'admin') {
-        res.status(403).json({
-          success: false,
-          message: 'Acesso negado'
-        });
-        return;
-      }
-
-      const pokemonIds = await cardService.listCardPokemonId(targetUserId);
+      const cards = await cardService.listCardsByUserId(parseInt(userId)) as ICardResponse[];
       
-      res.json({
-        success: true,
-        data: pokemonIds
-      });
+      return ApiResponse.success(res, 'Cartas listadas com sucesso', cards);
     } catch (error) {
-      res.status(500).json({
-        success: false,
-        message: 'Erro interno do servidor'
-      });
+      return ApiResponse.internalError(res);
     }
   }
 
-  async listCards(req: Request, res: Response): Promise<void> {
+  async listAllCards(req: AuthRequest, res: Response): Promise<void> {
     try {
-      const { userId } = req.params;
-      const token = req.headers.authorization?.replace('Bearer ', '');
-
-      if (!token) {
-        res.status(401).json({
-          success: false,
-          message: 'Token não fornecido'
-        });
-        return;
-      }
-
-      const tokenData = await authService.verifyToken(token);
-      if (!tokenData) {
-        res.status(401).json({
-          success: false,
-          message: 'Token inválido'
-        });
-        return;
-      }
-
-      // Verificar se pode acessar os dados
-      const userIdFromToken = tokenData.userId;
-      const targetUserId = parseInt(userId);
-
-      if (userIdFromToken !== targetUserId && tokenData.role !== 'admin') {
-        res.status(403).json({
-          success: false,
-          message: 'Acesso negado'
-        });
-        return;
-      }
-
-      const cards = await cardService.listCards(targetUserId);
-      
-      res.json({
-        success: true,
-        data: cards
-      });
+      const cards = await cardService.listAllCards() as IListAllCardsResponse[];
+      return ApiResponse.success(res, 'Todas as cartas listadas com sucesso', cards);
     } catch (error) {
-      res.status(500).json({
-        success: false,
-        message: 'Erro interno do servidor'
-      });
-    }
-  }
-
-  async getCardDescription(req: Request, res: Response): Promise<void> {
-    try {
-      const { cardId } = req.params;
-      const token = req.headers.authorization?.replace('Bearer ', '');
-
-      if (!token) {
-        res.status(401).json({
-          success: false,
-          message: 'Token não fornecido'
-        });
-        return;
-      }
-
-      const tokenData = await authService.verifyToken(token);
-      if (!tokenData) {
-        res.status(401).json({
-          success: false,
-          message: 'Token inválido'
-        });
-        return;
-      }
-
-      const description = await cardService.getCardDescription(parseInt(cardId));
-      
-      if (description) {
-        res.json({
-          success: true,
-          data: { description }
-        });
-      } else {
-        res.status(404).json({
-          success: false,
-          message: 'Carta não encontrada'
-        });
-      }
-    } catch (error) {
-      res.status(500).json({
-        success: false,
-        message: 'Erro interno do servidor'
-      });
+      return ApiResponse.internalError(res);
     }
   }
 }
