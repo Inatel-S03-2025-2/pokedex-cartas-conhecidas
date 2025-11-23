@@ -1,8 +1,9 @@
 "use client"
 
+import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import Image from "next/image"
-import { X, Zap, Shield } from "lucide-react"
+import { X, Zap, Shield, ImageOff } from "lucide-react"
 import { Pokemon } from "@/contexts/PokemonContext"
 
 interface PokemonModalProps {
@@ -12,15 +13,21 @@ interface PokemonModalProps {
 }
 
 export default function PokemonModal({ pokemon, isOpen, onClose }: PokemonModalProps) {
+  const [imageError, setImageError] = useState(false)
+  const [imageLoading, setImageLoading] = useState(true)
+
   if (!pokemon) return null
 
   const getTypeColor = (type: string) => {
     const colors = {
-      "Fogo": "from-white-500 to-white-500",
-      "Água": "from-white-500 to-white-500",
-      "Planta": "from-white-500 to-white-500",
-      "Elétrico": "from-white-500 to-white-500",
-      "Psíquico": "from-white-500 to-white-500"
+      "Fogo": "from-red-500 to-orange-500",
+      "Água": "from-blue-500 to-cyan-500",
+      "Planta": "from-green-500 to-emerald-500",
+      "Elétrico": "from-yellow-500 to-amber-500",
+      "Psíquico": "from-purple-500 to-pink-500",
+      "Normal": "from-gray-500 to-slate-500",
+      "Fantasma": "from-indigo-500 to-purple-500",
+      "Gelo": "from-cyan-500 to-blue-500"
     }
     return colors[type as keyof typeof colors] || "from-gray-500 to-gray-600"
   }
@@ -35,6 +42,37 @@ export default function PokemonModal({ pokemon, isOpen, onClose }: PokemonModalP
     return colors[rarity as keyof typeof colors] || "text-gray-600"
   }
 
+  const handleClose = () => {
+    try {
+      setImageError(false)
+      setImageLoading(true)
+      onClose()
+    } catch (error) {
+      console.error('Erro ao fechar modal:', error)
+    }
+  }
+
+  const handleImageError = () => {
+    console.warn(`Erro ao carregar imagem do Pokémon ${pokemon.name} no modal`)
+    setImageError(true)
+    setImageLoading(false)
+  }
+
+  const handleImageLoad = () => {
+    setImageLoading(false)
+  }
+
+  // Função para garantir que os valores de stats sejam válidos
+  const getSafeStatValue = (value: number, max: number = 200): number => {
+    try {
+      const safeValue = Math.max(0, Math.min(value, max))
+      return isNaN(safeValue) ? 0 : safeValue
+    } catch (error) {
+      console.error('Erro ao calcular valor de stat:', error)
+      return 0
+    }
+  }
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -43,7 +81,7 @@ export default function PokemonModal({ pokemon, isOpen, onClose }: PokemonModalP
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50"
-          onClick={onClose}
+          onClick={handleClose}
         >
           <motion.div
             initial={{ scale: 0.8, opacity: 0 }}
@@ -55,8 +93,9 @@ export default function PokemonModal({ pokemon, isOpen, onClose }: PokemonModalP
             {/* Header */}
             <div className={`bg-gradient-to-r ${getTypeColor(pokemon.type)} p-6 text-white relative`}>
               <button
-                onClick={onClose}
+                onClick={handleClose}
                 className="absolute top-4 right-4 p-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
+                aria-label="Fechar modal"
               >
                 <X size={20} />
               </button>
@@ -66,14 +105,35 @@ export default function PokemonModal({ pokemon, isOpen, onClose }: PokemonModalP
                 <p className="text-white/80">#{pokemon.id.toString().padStart(3, '0')}</p>
               </div>
 
-              <div className="flex items-center justify-center">
-                <Image 
-                  src={pokemon.image} 
-                  alt={pokemon.name} 
-                  width={150} 
-                  height={150} 
-                  className="drop-shadow-2xl"
-                />
+              <div className="flex items-center justify-center relative">
+                {imageError ? (
+                  <div className="flex flex-col items-center justify-center text-white/80 h-[150px]">
+                    <ImageOff size={48} className="mb-2" />
+                    <span className="text-sm">Imagem não disponível</span>
+                  </div>
+                ) : (
+                  <>
+                    {imageLoading && (
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <motion.div
+                          animate={{ rotate: 360 }}
+                          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                          className="w-12 h-12 border-4 border-white border-t-transparent rounded-full"
+                        />
+                      </div>
+                    )}
+                    <Image 
+                      src={pokemon.image} 
+                      alt={pokemon.name} 
+                      width={150} 
+                      height={150} 
+                      className={`drop-shadow-2xl ${imageLoading ? 'opacity-0' : 'opacity-100'}`}
+                      onError={handleImageError}
+                      onLoad={handleImageLoad}
+                      priority={false}
+                    />
+                  </>
+                )}
               </div>
             </div>
 
@@ -106,11 +166,11 @@ export default function PokemonModal({ pokemon, isOpen, onClose }: PokemonModalP
                     <div className="flex items-center gap-2">
                       <div className="w-24 bg-gray-200 rounded-full h-2">
                         <div 
-                          className="bg-red-500 h-2 rounded-full" 
-                          style={{ width: `${(pokemon.hp / 200) * 100}%` }}
+                          className="bg-red-500 h-2 rounded-full transition-all" 
+                          style={{ width: `${(getSafeStatValue(pokemon.hp) / 200) * 100}%` }}
                         />
                       </div>
-                      <span className="text-sm font-semibold w-8">{pokemon.hp}</span>
+                      <span className="text-sm font-semibold w-8">{getSafeStatValue(pokemon.hp)}</span>
                     </div>
                   </div>
 
@@ -122,11 +182,11 @@ export default function PokemonModal({ pokemon, isOpen, onClose }: PokemonModalP
                     <div className="flex items-center gap-2">
                       <div className="w-24 bg-gray-200 rounded-full h-2">
                         <div 
-                          className="bg-orange-500 h-2 rounded-full" 
-                          style={{ width: `${(pokemon.attack / 200) * 100}%` }}
+                          className="bg-orange-500 h-2 rounded-full transition-all" 
+                          style={{ width: `${(getSafeStatValue(pokemon.attack) / 200) * 100}%` }}
                         />
                       </div>
-                      <span className="text-sm font-semibold w-8">{pokemon.attack}</span>
+                      <span className="text-sm font-semibold w-8">{getSafeStatValue(pokemon.attack)}</span>
                     </div>
                   </div>
 
@@ -138,11 +198,11 @@ export default function PokemonModal({ pokemon, isOpen, onClose }: PokemonModalP
                     <div className="flex items-center gap-2">
                       <div className="w-24 bg-gray-200 rounded-full h-2">
                         <div 
-                          className="bg-blue-500 h-2 rounded-full" 
-                          style={{ width: `${(pokemon.defense / 200) * 100}%` }}
+                          className="bg-blue-500 h-2 rounded-full transition-all" 
+                          style={{ width: `${(getSafeStatValue(pokemon.defense) / 200) * 100}%` }}
                         />
                       </div>
-                      <span className="text-sm font-semibold w-8">{pokemon.defense}</span>
+                      <span className="text-sm font-semibold w-8">{getSafeStatValue(pokemon.defense)}</span>
                     </div>
                   </div>
                 </div>
@@ -151,7 +211,9 @@ export default function PokemonModal({ pokemon, isOpen, onClose }: PokemonModalP
               {/* Description */}
               <div>
                 <h3 className="text-lg font-semibold mb-2">Descrição</h3>
-                <p className="text-gray-600 text-sm leading-relaxed">{pokemon.description}</p>
+                <p className="text-gray-600 text-sm leading-relaxed">
+                  {pokemon.description || 'Descrição não disponível'}
+                </p>
               </div>
             </div>
           </motion.div>
