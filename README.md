@@ -1,3 +1,5 @@
+Vídeo de apresentação (padrões arquiteturais): https://drive.google.com/file/d/1PBBhoqN1TEsK9t7_FLIzdeZEXf0DXovM/view?usp=sharing
+
 Link da pagina de documentação: https://www.notion.so/Projeto-Pok-dex-Gest-o-de-Cartas-de-Jogador-25c8e770f6a980eab8e7f792d3f06349?source=copy_link
 
 # pokedex-cartas-conhecidas
