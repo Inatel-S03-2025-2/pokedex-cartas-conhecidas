@@ -20,7 +20,25 @@ export class JWTService {
 
   async verifyToken(token: string): Promise<IVerifyTokenResponse> {
     try {
-      const decoded = jwt.verify(token, this.jwtSecret);
+      // Verificar se o token tem o formato básico correto
+      if (!token || typeof token !== 'string') {
+        Logger.warn('Token is missing or not a string', { tokenType: typeof token, hasToken: !!token });
+        return { isValid: false };
+      }
+
+      // Limpar token de possíveis espaços ou caracteres extras
+      const cleanToken = token.trim();
+      
+      // Verificar se o token tem o formato JWT básico (3 partes separadas por ponto)
+      if (cleanToken.split('.').length !== 3) {
+        Logger.warn('Token format is invalid - should have 3 parts separated by dots', { 
+          token: cleanToken.substring(0, 50) + '...', 
+          parts: cleanToken.split('.').length 
+        });
+        return { isValid: false };
+      }
+
+      const decoded = jwt.verify(cleanToken, this.jwtSecret);
       
       const payload = decoded as IJWTPayload;
 
