@@ -15,6 +15,13 @@ Pokedex - Responsável por gerenciar as cartas conhecidas por cada jogador.
 ![diagrama-classes](./assets/uml-classes.png)
 ![diagrama-use-cases](./assets/uml-casos-de-uso.png)
 
+## Configuração e Instalação
+
+Para configurações específicas de cada módulo do sistema, consulte:
+
+- **Backend**: Veja [backend/BACKEND.md](./backend/BACKEND.md) para instalação, configuração e uso da API
+- **Frontend**: Veja [frontend/FRONTEND.md](./frontend/FRONTEND.md) para configuração da interface web
+
 ## Equipe
 - Natália Jorge
 - Vinicius Pereira

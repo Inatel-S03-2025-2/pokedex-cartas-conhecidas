@@ -1,99 +1,71 @@
-# Backend3 - SOA Simples Pokédex
+# Backend - Pokédex API
 
-## Arquitetura SOA Simples
+## Stack Tecnológica
 
-Este backend implementa uma arquitetura **Service-Oriented Architecture (SOA)** simples seguindo o diagrama de classes fornecido.
+- **Node.js + Express** - Servidor web
+- **TypeScript** - Linguagem principal 
+- **Prisma + SQLite** - ORM e banco de dados
+- **JWT** - Autenticação
 
-## Estrutura do Projeto
+## Instalação e Configuração
 
-```
-backend3/
-├── src/
-│   ├── controllers/         # Camada de apresentação
-│   │   ├── UserController.ts
-│   │   └── CardController.ts
-│   ├── services/           # Camada de lógica de negócio
-│   │   ├── UserService.ts
-│   │   ├── AuthService.ts
-│   │   └── CardService.ts
-│   ├── models/            # Modelos de dados
-│   │   ├── UserModel.ts
-│   │   └── CardModel.ts
-│   ├── external/          # APIs externas
-│   │   └── PokeAPI.ts
-│   └── app.ts            # Aplicação principal
-├── package.json
-└── tsconfig.json
-```
+### Pré-requisitos
 
-## Funcionalidades
+- Node.js 18+ instalado
 
-### Conforme Diagrama de Casos de Uso:
-
-1. **Login de Usuário**
-   - Autenticação com login/senha
-   - Geração de session token
-
-2. **Listar Cartas Conhecidas**
-   - Ver cartas que o usuário já conhece
-   - Filtros por pokémon ID
-
-3. **Registrar Carta como Conhecida**
-   - Marcar cartas como conhecidas pelo usuário
-   - Integração com PokeAPI para dados da carta
-
-4. **Ver Descrição da Carta**
-   - Obter detalhes completos da carta
-   - Dados vindos da PokeAPI
-
-## Classes Implementadas
-
-### Controllers
-- `UserController`: login(), logout()
-- `CardController`: markAsKnown(), listCardPokemonId(), listCards(), getCardDescription()
-
-### Services  
-- `UserService`: createSession(), deleteSession()
-- `AuthService`: verifyToken(), verifyRole()
-- `CardService`: updateCard(), listCards(), listCardPokemonId(), getCardDescription()
-
-### Models
-- `UserModel`: id, sessionToken, role
-- `CardModel`: cardId, userId, pokeId, name, type, description
-
-### External APIs
-- `PokeAPI`: getCardData()
-
-## Como Executar
+### 1. Instalar Dependências
 
 ```bash
-# Instalar dependências
+cd backend/
 npm install
-
-# Executar em modo desenvolvimento  
-npm run dev
-
-# Build para produção
-npm run build
-npm start
 ```
 
-## Endpoints da API
+### 2. Configurar Variáveis de Ambiente
 
-### Autenticação
-- `POST /auth/login` - Login do usuário
-- `POST /auth/logout` - Logout do usuário
+Copie o arquivo de exemplo e configure suas variáveis:
 
-### Cartas
-- `GET /cards` - Listar cartas do usuário
-- `GET /cards/pokemon/:id` - Listar cartas de um pokémon específico
-- `POST /cards/:cardId/known` - Marcar carta como conhecida
-- `GET /cards/:cardId/description` - Obter descrição da carta
+```bash
+cp .env.example .env
+```
 
-## Tecnologias
+Edite o arquivo `.env` e configure as seguintes variáveis:
 
-- **Node.js + Express**: Servidor web
-- **TypeScript**: Linguagem principal
-- **Prisma**: ORM para banco de dados
-- **PostgreSQL**: Banco de dados
-- **Axios**: Cliente HTTP para PokeAPI
+```env
+JWT_SECRET="your-super-secret-jwt-key-change-in-production"
+PORT=3000
+NODE_ENV=development
+```
+
+> **⚠️ IMPORTANTE**: Gere um JWT_SECRET seguro em produção. Você pode usar: https://generate-secret.vercel.app/128
+
+### 3. Configurar Banco de Dados
+
+Gere o cliente Prisma:
+
+```bash
+npm run prisma:generate
+```
+
+Execute as migrations para criar o banco de dados:
+
+```bash
+npm run prisma:migrate
+```
+
+### 4. Executar o Servidor
+
+```bash
+npm run dev
+```
+
+O servidor estará rodando em `http://localhost:3000`
+
+### 5. (Opcional) Script Mock API de autenticação
+
+```bash
+npm run mock:auth
+```
+
+## API Documentation
+
+Documentação Swagger disponível em: `http://localhost:3000/api-docs`
