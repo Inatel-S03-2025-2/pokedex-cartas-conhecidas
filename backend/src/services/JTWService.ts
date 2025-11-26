@@ -4,7 +4,19 @@ import { Logger } from '../utils/Logger';
 import { IJWTPayload, IVerifyTokenResponse } from '../interfaces';
 
 export class JWTService {
-  private jwtSecret = process.env.JWT_SECRET!;
+  private jwtSecret: string;
+
+  constructor() {
+    this.jwtSecret = process.env.JWT_SECRET!;
+    
+    if (!this.jwtSecret) {
+      throw new Error('JWT_SECRET environment variable is required');
+    }
+    
+    if (this.jwtSecret.length < 32) {
+      Logger.warn('JWT_SECRET is shorter than recommended (32 characters)', { length: this.jwtSecret.length });
+    }
+  }
 
   async verifyToken(token: string): Promise<IVerifyTokenResponse> {
     try {
