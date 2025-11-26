@@ -15,7 +15,19 @@ export async function authMiddleware(
   next: NextFunction
 ): Promise<void> {
   try {
-    const token = req.headers.authorization?.replace('Bearer ', '');
+    const authHeader = req.headers.authorization;
+    
+    if (!authHeader) {
+      ApiResponse.unauthorized(res, 'Header de autorização não fornecido');
+      return;
+    }
+
+    if (!authHeader.startsWith('Bearer ')) {
+      ApiResponse.unauthorized(res, 'Formato do token inválido. Use: Bearer <token>');
+      return;
+    }
+
+    const token = authHeader.replace('Bearer ', '').trim();
     
     if (!token) {
       ApiResponse.unauthorized(res, 'Token não fornecido');
@@ -24,15 +36,15 @@ export async function authMiddleware(
 
     // Verificar se o token é válido
     const tokenData = await tokenManager.verifyToken(token);
-    if (!tokenData) {
+    if (!tokenData.isValid || !tokenData.payload) {
       ApiResponse.unauthorized(res, 'Token inválido');
       return;
     }
 
     // Adicionar dados do usuário à requisição (diretamente do token)
     req.user = {
-      userId: tokenData.userId,
-      role: tokenData.role
+      userId: tokenData.payload.userId,
+      role: tokenData.payload.role
     };
 
     next();
