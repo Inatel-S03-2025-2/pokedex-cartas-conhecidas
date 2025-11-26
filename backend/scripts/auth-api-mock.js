@@ -3,6 +3,8 @@ const jwt = require('jsonwebtoken');
 
 const app = express();
 app.use(express.json());
+// generate at https://generate-secret.vercel.app/32
+SECRET = '353de3c81ec4934f9f8421f68e085492';
 
 // Usuários mock para teste (apenas users externos)
 const users = [
@@ -37,18 +39,13 @@ app.post('/login', (req, res) => {
   
   // Gerar token do AuthAPI
   const token = jwt.sign(
-    { userId: user.userId, email: user.email, role: user.role },
-    'auth-api-secret',
-    { expiresIn: '24h' }
+    { email: user.email },
+    SECRET,
+    { expiresIn: '1h' }
   );
   
   res.json({
-    user: {
-      userId: user.userId,
-      email: user.email,
-      role: user.role
-    },
-    token: token
+    externalToken: token
   });
 });
 
