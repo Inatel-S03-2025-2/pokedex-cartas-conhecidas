@@ -52,6 +52,12 @@ Execute as migrations para criar o banco de dados:
 npm run prisma:migrate
 ```
 
+Caso precise alterar os dados diretamente, utilize o Prisma Studio:
+
+```bash
+npm run prisma:studio
+```
+
 ### 4. Executar o Servidor
 
 ```bash
