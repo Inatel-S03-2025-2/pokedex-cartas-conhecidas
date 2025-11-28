@@ -52,13 +52,26 @@ Execute as migrations para criar o banco de dados:
 npm run prisma:migrate
 ```
 
+### 4. Gerar Tokens para Usuários de Serviço
+
+Após configurar o `JWT_SECRET` e executar as migrations, gere os tokens JWT para os usuários de serviço:
+
+```bash
+npm run generate:service-tokens
+```
+
+Este script irá:
+- Carregar o `JWT_SECRET` do arquivo `.env`
+- Gerar tokens JWT válidos para os usuários `marker-service` e `viewer-service`
+- Atualizar os tokens no banco de dados
+
 Caso precise alterar os dados diretamente, utilize o Prisma Studio:
 
 ```bash
 npm run prisma:studio
 ```
 
-### 4. Executar o Servidor
+### 5. Executar o Servidor
 
 ```bash
 npm run dev
@@ -66,7 +79,7 @@ npm run dev
 
 O servidor estará rodando em `http://localhost:3000`
 
-### 5. (Opcional) Script Mock API de autenticação
+### 6. (Opcional) Script Mock API de autenticação
 
 ```bash
 npm run mock:auth
